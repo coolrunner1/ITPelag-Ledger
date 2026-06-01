@@ -3,11 +3,9 @@
 namespace App\Repositories;
 
 use App\Models\Transaction;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
-use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 
-class TransactionRepository extends Repository
+class TransactionRepository implements ITransactionRepository
 {
     public function findTransactions(?string $search, ?string $date, ?int $accountId): Collection
     {
@@ -28,22 +26,22 @@ class TransactionRepository extends Repository
             ->get();
     }
 
-    function getTransaction(int $id): ?Transaction
+    public function getTransaction(int $id): ?Transaction
     {
         return Transaction::find($id);
     }
 
-    function createTransaction(DataWrapperContract $data): Transaction
+    public function createTransaction(Transaction $transaction): Transaction
     {
-
+        return Transaction::create($transaction);
     }
 
-    function updateTransaction(Transaction $transaction, DataWrapperContract $data): Transaction
+    public function updateTransaction(int $id, Transaction $transaction): ?Transaction
     {
-
+        return null;
     }
 
-    function deleteTransaction(int $id): bool
+    public function deleteTransaction(int $id): bool
     {
         return Transaction::destroy($id);
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Transaction\Pages;
 
+use App\Services\ILedgerService;
 use App\Services\LedgerService;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Contracts\UI\ComponentContract;
@@ -25,8 +26,14 @@ use Throwable;
  */
 class TransactionIndexPage extends IndexPage
 {
-    public function __construct(private LedgerService  $ledgerService) {}
     protected bool $isLazy = true;
+
+    private ILedgerService $ledgerService;
+    public function __construct(
+        LedgerService $ledgerService,
+    ) {
+        $this->ledgerService = $ledgerService;
+    }
 
     /**
      * @return list<FieldContract>

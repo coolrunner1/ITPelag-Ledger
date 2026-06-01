@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction\Pages;
 
 use App\MoonShine\Resources\JournalEntry\JournalEntryResource;
+use App\Services\ILedgerService;
 use App\Services\LedgerService;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
@@ -32,7 +33,14 @@ class TransactionFormPage extends FormPage
 {
     protected bool $isAsync = false;
     protected bool $errorsAbove = true;
-    public function __construct(private LedgerService  $ledgerService) {}
+    private ILedgerService $ledgerService;
+
+    public function __construct(
+        LedgerService $ledgerService,
+    ) {
+        $this->ledgerService = $ledgerService;
+    }
+
     /**
      * @return list<ComponentContract|FieldContract>
      */

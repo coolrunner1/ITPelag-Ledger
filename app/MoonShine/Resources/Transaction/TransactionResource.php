@@ -9,6 +9,7 @@ use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 
+use App\Services\ILedgerService;
 use App\Services\LedgerService;
 use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -27,9 +28,13 @@ use MoonShine\Support\Enums\ToastType;
  */
 class TransactionResource extends CrudResource {
 
+    private ILedgerService $ledgerService;
+
     public function __construct(
-        private readonly LedgerService $ledgerService,
-    ) {}
+        LedgerService $ledgerService,
+    ) {
+        $this->ledgerService = $ledgerService;
+    }
     protected ?string $casterKeyName = 'id';
 
     protected string $title = 'Transactions';

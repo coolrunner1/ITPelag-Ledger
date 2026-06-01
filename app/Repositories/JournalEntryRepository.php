@@ -4,7 +4,7 @@ namespace App\Repositories;
 
 use App\Models\JournalEntry;
 
-class JournalEntryRepository extends Repository
+class JournalEntryRepository implements IJournalEntryRepository
 {
     function getJournalEntries(): iterable
     {

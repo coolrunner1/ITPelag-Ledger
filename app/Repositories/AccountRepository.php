@@ -4,9 +4,9 @@ namespace App\Repositories;
 
 use App\Models\Account;
 
-class AccountRepository extends Repository
+class AccountRepository implements IAccountRepository
 {
-    function findAccountOptions(): array
+    public function findAccountOptions(): array
     {
         return Account::query()
             ->where('is_active', true)
@@ -16,7 +16,7 @@ class AccountRepository extends Repository
             ->toArray();
     }
 
-    function findAccount(int $id) {
+    public function findAccount(int $id): ?Account {
         return Account::find($id);
     }
 }
