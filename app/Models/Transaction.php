@@ -12,10 +12,12 @@ class Transaction extends Model
     protected $fillable = [
         'date',
         'description',
+        'is_posted',
     ];
 
     protected $casts = [
         'date' => 'date',
+        'is_posted' => 'boolean',
     ];
 
     public function journalEntries(): HasMany
