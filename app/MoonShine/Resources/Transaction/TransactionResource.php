@@ -80,7 +80,7 @@ class TransactionResource extends CrudResource {
     {
         $id = $this->getItemID();
 
-        $transaction = $this->ledgerService->getTransactionWithJournalEntries(intval($id));
+        $transaction = $this->ledgerService->getTransaction(intval($id));
 
         if (!$transaction) {
             return null;
@@ -98,6 +98,12 @@ class TransactionResource extends CrudResource {
         try {
             if (!$transactionId) {
                 $transaction = $this->ledgerService->createTransaction(
+                    $transactionData,
+                    $journalEntries
+                );
+            } else {
+                $transaction = $this->ledgerService->updateTransaction(
+                    $transactionId,
                     $transactionData,
                     $journalEntries
                 );

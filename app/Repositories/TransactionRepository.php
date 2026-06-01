@@ -27,7 +27,7 @@ class TransactionRepository implements ITransactionRepository
             ->get();
     }
 
-    public function getTransaction(int $id): ?Transaction
+    public function findTransaction(int $id): ?Transaction
     {
         return Transaction::find($id);
     }
@@ -37,9 +37,17 @@ class TransactionRepository implements ITransactionRepository
         return Transaction::create($transaction->toArray());
     }
 
-    public function updateTransaction(int $id, Transaction $transaction): ?Transaction
+    public function updateTransaction(int $id, TransactionDTO $transactionDTO): ?Transaction
     {
-        return null;
+        $transaction = $this->findTransaction($id);
+
+        if (!$transaction) {
+            return null;
+        }
+
+        $transaction->update($transactionDTO->toArray());
+
+        return $transaction;
     }
 
     public function deleteTransaction(int $id): bool

@@ -18,11 +18,11 @@ interface ITransactionRepository
      */
     public function findTransactions(?string $search, ?string $date, ?int $accountId): Collection;
 
-    public function getTransaction(int $id): ?Transaction;
+    public function findTransaction(int $id): ?Transaction;
 
     public function createTransaction(TransactionDTO $transaction): Transaction;
 
-    public function updateTransaction(int $id, Transaction $transaction): ?Transaction;
+    public function updateTransaction(int $id, TransactionDTO $transactionDTO): ?Transaction;
 
     public function deleteTransaction(int $id): bool;
 }

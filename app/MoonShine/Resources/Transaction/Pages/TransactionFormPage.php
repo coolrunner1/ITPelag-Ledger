@@ -57,7 +57,11 @@ class TransactionFormPage extends FormPage
                     JournalEntryResource::class
                 )
                     ->fields([
-                        Number::make('Amount', 'amount')->default(1),
+                        ID::make(),
+                        Number::make('Amount', 'amount')
+                            ->default(1.0)
+                            ->step(0.01)
+                            ->min(0.00),
                         Select::make('Type', 'type')->options([
                             'debit' => 'Debit',
                             'credit' => 'Credit',
@@ -65,7 +69,7 @@ class TransactionFormPage extends FormPage
                         Select::make('Account', 'account_id')->options(
                             $this->ledgerService->getAccountOptions()
                         )->nullable()
-                    ])
+                    ])->removable()
             ]),
         ];
     }

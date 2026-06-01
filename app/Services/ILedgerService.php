@@ -33,6 +33,14 @@ interface ILedgerService
     public function createTransaction(array $data, array $entries): Transaction;
 
     /**
+     * Fetches a transaction
+     *
+     * @param  int              $id The Transaction ID
+     * @return Transaction|null
+     */
+    function getTransaction(int $id): ?Transaction;
+
+    /**
      * Updates an existing transaction by id with journal entries and checks their validity (debit must be equal to credit)
      *
      * @param int $id The Transaction ID
@@ -48,6 +56,7 @@ interface ILedgerService
      * @param int $id The Transaction ID
      */
     function deleteTransaction(int $id): bool;
+
     /**
      * Fetches a transaction with its journal entries
      *
