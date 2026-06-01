@@ -92,7 +92,7 @@ class TransactionResource extends CrudResource {
     public function save(DataWrapperContract $item, ?FieldsContract $fields = null): DataWrapperContract
     {
         $transactionId   = $this->getItemID() ? (int) $this->getItemID() : null;
-        $transactionData = request()->only(['date', 'description']);
+        $transactionData = request()->only(['date', 'description', 'is_posted']);
         $journalEntries  = request()->input('journalEntries', []);
 
         try {

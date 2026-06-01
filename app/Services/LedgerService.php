@@ -82,7 +82,7 @@ class LedgerService implements ILedgerService
             $transaction = $this->transactionRepository->updateTransaction($id, TransactionDTO::fromArray($data));
 
             if (!$transaction) {
-                throw new Exception("Transaction with id {$id} does not exist.");
+                throw new Exception("Transaction with id {$id} does not exist or can't be updated.");
             }
 
             $oldEntries = $this->journalEntryRepository->findJournalEntriesByTransactionId($id);
@@ -124,8 +124,15 @@ class LedgerService implements ILedgerService
         });
     }
 
+    /**
+     * @throws Exception
+     */
     function deleteTransaction(int $id): bool
     {
+        $transaction = $this->transactionRepository->findTransaction($id);
+        if ($transaction->is_posted) {
+            throw new Exception("Transaction is already posted. You can't delete it.");
+        }
         return $this->transactionRepository->deleteTransaction($id);
     }
 

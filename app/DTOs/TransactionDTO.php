@@ -9,6 +9,7 @@ final readonly class TransactionDTO implements IDTO
     public function __construct(
         public string $date,
         public string $description,
+        public bool $isPosted,
     ) {}
 
     public static function fromArray(array $data): self
@@ -16,6 +17,7 @@ final readonly class TransactionDTO implements IDTO
         return new self(
             date: $data['date'],
             description: $data['description'],
+            isPosted: $data['is_posted'],
         );
     }
 
@@ -29,6 +31,7 @@ final readonly class TransactionDTO implements IDTO
         return [
             'date' => $this->date,
             'description' => $this->description,
+            'is_posted' => $this->isPosted,
         ];
     }
 }

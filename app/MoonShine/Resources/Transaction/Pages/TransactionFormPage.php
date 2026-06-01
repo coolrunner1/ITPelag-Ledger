@@ -12,6 +12,7 @@ use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
 use MoonShine\Laravel\Pages\Crud\FormPage;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FormBuilderContract;
+use MoonShine\UI\Components\Badge;
 use MoonShine\UI\Components\FormBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
@@ -22,6 +23,7 @@ use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Select;
+use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use Throwable;
 
@@ -51,6 +53,8 @@ class TransactionFormPage extends FormPage
                 ID::make(),
                 Date::make('Date', 'date'),
                 Text::make('Description', 'description'),
+                Switcher::make('Is Posted', 'is_posted')
+                    ->default(false),
                 RelationRepeater::make(
                     'Journal Entries',
                     'journalEntries',

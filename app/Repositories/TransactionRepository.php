@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Transaction;
+use Exception;
 use Illuminate\Database\Eloquent\Collection;
 use App\DTOs\TransactionDTO;
 
@@ -41,7 +42,7 @@ class TransactionRepository implements ITransactionRepository
     {
         $transaction = $this->findTransaction($id);
 
-        if (!$transaction) {
+        if (!$transaction || $transaction->is_posted) {
             return null;
         }
 
