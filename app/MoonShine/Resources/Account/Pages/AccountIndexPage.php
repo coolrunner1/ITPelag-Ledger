@@ -2,30 +2,25 @@
 
 declare(strict_types=1);
 
-namespace App\MoonShine\Resources\Transaction\Pages;
+namespace App\MoonShine\Resources\Account\Pages;
 
-use App\Services\LedgerService;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\UI\Components\Metrics\Wrapped\Metric;
-use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
-use App\MoonShine\Resources\Transaction\TransactionResource;
+use App\MoonShine\Resources\Account\AccountResource;
 use MoonShine\Support\ListOf;
-use MoonShine\UI\Fields\Select;
-use MoonShine\UI\Fields\Text;
 use Throwable;
 
 
 /**
- * @extends IndexPage<TransactionResource>
+ * @extends IndexPage<AccountResource>
  */
-class TransactionIndexPage extends IndexPage
+class AccountIndexPage extends IndexPage
 {
-    public function __construct(private LedgerService  $ledgerService) {}
     protected bool $isLazy = true;
 
     /**
@@ -35,9 +30,6 @@ class TransactionIndexPage extends IndexPage
     {
         return [
             ID::make(),
-            Date::make('Date', 'date'),
-            Text::make('Description', 'description'),
-            Date::make('Created at', 'created_at'),
         ];
     }
 
@@ -54,15 +46,7 @@ class TransactionIndexPage extends IndexPage
      */
     protected function filters(): iterable
     {
-        return [
-            Date::make('Date', 'date'),
-            Select::make('Account', 'account_id')
-                ->nullable()
-                ->options(
-                    $this->ledgerService->getAccountOptions()
-                ),
-
-        ];
+        return [];
     }
 
     /**

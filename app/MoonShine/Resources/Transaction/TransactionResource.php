@@ -10,6 +10,7 @@ use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 
 use App\Services\LedgerService;
+use Illuminate\Support\Facades\Validator;
 use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
@@ -46,7 +47,24 @@ class TransactionResource extends CrudResource {
      */
     public function getItems(): iterable
     {
-        return $this->ledgerService->getTransactions();
+        $filterData = request()->input('filter', []);
+
+        $validator = Validator::make($filterData, [
+            'date'       => ['nullable', 'date_format:Y-m-d'],
+            'account_id' => ['nullable', 'integer', 'exists:accounts,id'],
+        ]);
+
+        if ($validator->fails()) {
+            return new Collection([]);
+        }
+
+        $search = request()->input('search');
+
+        return $this->ledgerService->getTransactions(
+            $search,
+            date: $filterData['date'] ?? null,
+            accountId: $filterData['account_id'] ?? null
+        );
     }
 
     public function findItem(bool $orFail = false): ?DataWrapperContract

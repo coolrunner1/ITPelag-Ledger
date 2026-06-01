@@ -9,6 +9,15 @@ class Transaction extends Model
 {
     const UPDATED_AT = null;
 
+    protected $fillable = [
+        'date',
+        'description',
+    ];
+
+    protected $casts = [
+        'date' => 'date',
+    ];
+
     public function journalEntries(): HasMany
     {
         return $this->hasMany(JournalEntry::class);

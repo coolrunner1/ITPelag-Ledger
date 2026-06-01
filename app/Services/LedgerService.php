@@ -12,7 +12,8 @@ class LedgerService extends Service
 {
     public function __construct(
         private readonly TransactionRepository $transactionRepository,
-        private readonly JournalEntryRepository $journalEntryRepository
+        private readonly JournalEntryRepository $journalEntryRepository,
+        private readonly AccountRepository $accountRepository,
     ) {}
 
     function getJournalEntries()
@@ -20,8 +21,14 @@ class LedgerService extends Service
         return $this->journalEntryRepository->getJournalEntries();
     }
 
-    function getTransactions(): iterable {
-        return $this->transactionRepository->getTransactions();
+    function getAccountOptions(): array
+    {
+        return $this->accountRepository->findAccountOptions();
+    }
+
+    function getTransactions(?string $search, ?string $date, ?string $accountId): iterable
+    {
+        return $this->transactionRepository->findTransactions($search, $date, $accountId);
     }
 
     function getTransactionsByDate(string $date): iterable
