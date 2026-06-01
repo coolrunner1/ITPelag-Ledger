@@ -11,6 +11,7 @@ use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 
 use App\Services\LedgerService;
 use Exception;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use MoonShine\Crud\Resources\CrudResource;
@@ -74,7 +75,7 @@ class TransactionResource extends CrudResource {
     {
         $id = $this->getItemID();
 
-        $transaction = $this->ledgerService->getTransactionWithJournalEntry(intval($id));
+        $transaction = $this->ledgerService->getTransactionWithJournalEntries(intval($id));
 
         if (!$transaction) {
             return null;
@@ -85,9 +86,26 @@ class TransactionResource extends CrudResource {
 
     public function save(DataWrapperContract $item, ?FieldsContract $fields = null): DataWrapperContract
     {
-        $this->isRecentlyCreated = true;
+        $transactionId   = $this->getItemID() ? (int) $this->getItemID() : null;
+        $transactionData = request()->only(['date', 'description']);
+        $journalEntries  = request()->input('journalEntries', []);
 
-        return $item;
+        try {
+            if (!$transactionId) {
+                $transaction = $this->ledgerService->createTransaction(
+                    $transactionData,
+                    $journalEntries
+                );
+            }
+            // 3. Mark the state flag as successfully instantiated for the MoonShine component layout
+            $this->isRecentlyCreated = is_null($transactionId);
+
+            return new ModelDataWrapper($transaction);
+        } catch (Exception $e) {
+            throw new HttpResponseException(
+                response()->json(['message' => $e->getMessage()], 422)
+            );
+        }
     }
 
     public function delete(DataWrapperContract $item, ?FieldsContract $fields = null): bool
@@ -99,9 +117,9 @@ class TransactionResource extends CrudResource {
             }
             return $this->ledgerService->deleteTransaction($transaction->id);
         } catch (\Exception $e) {
-            throw ValidationException::withMessages([
-                'error' => "Something went wrong",
-            ]);
+            throw new HttpResponseException(
+                response()->json(['message' => $e->getMessage()], 422)
+            );
         }
     }
 

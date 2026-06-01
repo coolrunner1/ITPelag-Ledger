@@ -7,6 +7,7 @@ use App\Repositories\AccountRepository;
 use App\Repositories\JournalEntryRepository;
 use App\Repositories\TransactionRepository;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
+use Nette\NotImplementedException;
 
 class LedgerService extends Service
 {
@@ -18,34 +19,67 @@ class LedgerService extends Service
     {
     }
 
-    function getJournalEntries()
-    {
-        return $this->journalEntryRepository->getJournalEntries();
-    }
-
     function getAccountOptions(): array
     {
         return $this->accountRepository->findAccountOptions();
     }
 
+    /**
+     * Fetches transactions
+     *
+     * @param string|null $search    Search by description
+     * @param string|null $date      Filter by date
+     * @param string|null $accountId Filter by the account id
+     * @return iterable
+     */
     function getTransactions(?string $search, ?string $date, ?string $accountId): iterable
     {
         return $this->transactionRepository->findTransactions($search, $date, $accountId);
     }
 
+    /**
+     * Creates a transaction with journal entries and checks their validity (debit must be equal to credit)
+     *
+     * @param array $data Transaction details
+     * @param array $entries Array of journal entries
+     * @return Transaction
+     */
+    public function createTransaction(array $data, array $entries): Transaction
+    {
+        throw NotImplementedException::notImplemented();
+    }
+
+    /**
+     * Updates an existing transaction by id with journal entries and checks their validity (debit must be equal to credit)
+     *
+     * @param int      $id        The Transaction ID
+     * @param array    $data      Transaction details
+     * @param array    $entries   Array of journal entries
+     * @return Transaction
+     */
+    public function updateTransaction(int $id, array $data, array $entries): Transaction
+    {
+        throw NotImplementedException::notImplemented();
+    }
+
+    /**
+     * Deletes an existing transaction by id
+     *
+     * @param int $id The Transaction ID
+     */
     function deleteTransaction(int $id): bool
     {
         return $this->transactionRepository->deleteTransaction($id);
     }
 
-    function getTransactionWithJournalEntry(int $id): ?Transaction
+    /**
+     * Fetches a transaction with its journal entries
+     *
+     * @param  int              $id The Transaction ID
+     * @return Transaction|null
+     */
+    function getTransactionWithJournalEntries(int $id): ?Transaction
     {
-        $transaction = $this->transactionRepository->getTransaction($id);
-
-        if (is_null($transaction)) {
-            return null;
-        }
-
-        return $transaction;
+        return $this->transactionRepository->getTransaction($id);
     }
 }
