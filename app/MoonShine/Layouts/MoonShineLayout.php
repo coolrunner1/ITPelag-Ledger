@@ -33,6 +33,7 @@ final class MoonShineLayout extends AppLayout
         return [
             ...parent::menu(),
             MenuItem::make(TransactionResource::class, 'Transactions'),
+            MenuItem::make(AccountResource::class, 'Accounts'),
         ];
     }
 

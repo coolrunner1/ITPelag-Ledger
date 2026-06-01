@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Models\Transaction;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Collection;
+use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 
 class TransactionRepository extends Repository
 {
@@ -18,18 +19,12 @@ class TransactionRepository extends Repository
             ->when($date, function ($query, $date) {
                 $query->whereDate('date', $date);
             })
-
-            // 4. Look inside child rows to restrict rows to a specific accounting line
             ->when($accountId, function ($query, $accountId) {
                 $query->whereHas('journalEntries', function ($subQuery) use ($accountId) {
                     $subQuery->where('account_id', $accountId);
                 });
             })
-
-            // 5. Always display the latest bookkeeping entries first
             ->latest('date')
-
-            // 6. Return a paginator instance which MoonShine grids natively expect
             ->get();
     }
 
@@ -38,14 +33,18 @@ class TransactionRepository extends Repository
         return Transaction::find($id);
     }
 
-
-    function findTransactionsByDate(string $date)
+    function createTransaction(DataWrapperContract $data): Transaction
     {
-        return Transaction::all()->where('date', $date);
+
     }
 
-    function findTransactionsByAccountId(int $accountId)
+    function updateTransaction(Transaction $transaction, DataWrapperContract $data): Transaction
     {
-        return Transaction::all()->where('account_id', $accountId);
+
+    }
+
+    function deleteTransaction(int $id): bool
+    {
+        return Transaction::destroy($id);
     }
 }

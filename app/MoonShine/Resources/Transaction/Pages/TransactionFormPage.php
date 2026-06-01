@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction\Pages;
 
 use App\MoonShine\Resources\JournalEntry\JournalEntryResource;
+use App\Services\LedgerService;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
 use MoonShine\Laravel\Pages\Crud\FormPage;
@@ -29,6 +30,9 @@ use Throwable;
  */
 class TransactionFormPage extends FormPage
 {
+    protected bool $isAsync = false;
+    protected bool $errorsAbove = true;
+    public function __construct(private LedgerService  $ledgerService) {}
     /**
      * @return list<ComponentContract|FieldContract>
      */
@@ -45,11 +49,14 @@ class TransactionFormPage extends FormPage
                     JournalEntryResource::class
                 )
                     ->fields([
-                        Number::make('Amount', 'amount'),
+                        Number::make('Amount', 'amount')->default(1),
                         Select::make('Type', 'type')->options([
                             'debit' => 'Debit',
                             'credit' => 'Credit',
                         ]),
+                        Select::make('Account', 'account_id')->options(
+                            $this->ledgerService->getAccountOptions()
+                        )->nullable()
                     ])
             ]),
         ];
@@ -65,9 +72,23 @@ class TransactionFormPage extends FormPage
         return parent::formButtons();
     }
 
-    protected function rules(DataWrapperContract $item): array
+    protected function rules(mixed $item): array
     {
-        return [];
+        return [
+            'date'        => ['required', 'date_format:Y-m-d'],
+            'description' => ['required', 'string', 'min:5', 'max:255'],
+            'journalEntries.*.amount' => ['required', 'numeric', 'gt:0'],
+            'journalEntries.*.account_id' => ['required', 'integer', 'exists:accounts,id'],
+        ];
+    }
+
+    public function validationMessages(): array
+    {
+        return [
+            'journalEntries.*.amount.required' => 'The amount needs to be specified for the journal entry №:position.',
+            'journalEntries.*.amount.gt' => 'The amount must be greater than 0 (journal entry №:position).',
+            'journalEntries.*.account_id.required' => 'The account needs to be specified for the journal entry №:position.',
+        ];
     }
 
     /**

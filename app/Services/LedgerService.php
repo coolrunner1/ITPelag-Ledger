@@ -11,10 +11,12 @@ use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 class LedgerService extends Service
 {
     public function __construct(
-        private readonly TransactionRepository $transactionRepository,
+        private readonly TransactionRepository  $transactionRepository,
         private readonly JournalEntryRepository $journalEntryRepository,
-        private readonly AccountRepository $accountRepository,
-    ) {}
+        private readonly AccountRepository      $accountRepository,
+    )
+    {
+    }
 
     function getJournalEntries()
     {
@@ -31,14 +33,9 @@ class LedgerService extends Service
         return $this->transactionRepository->findTransactions($search, $date, $accountId);
     }
 
-    function getTransactionsByDate(string $date): iterable
+    function deleteTransaction(int $id): bool
     {
-
-    }
-
-    function getTransactionsByAccountId(string $accountId): iterable
-    {
-
+        return $this->transactionRepository->deleteTransaction($id);
     }
 
     function getTransactionWithJournalEntry(int $id): ?Transaction

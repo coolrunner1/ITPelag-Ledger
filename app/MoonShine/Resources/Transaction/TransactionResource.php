@@ -10,13 +10,16 @@ use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 
 use App\Services\LedgerService;
+use Exception;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 use Illuminate\Support\Collection;
 use MoonShine\Contracts\Core\PageContract;
+use MoonShine\Support\Enums\ToastType;
 
 /**
  * @extends CrudResource<array, TransactionIndexPage, TransactionFormPage, TransactionDetailPage>
@@ -89,11 +92,23 @@ class TransactionResource extends CrudResource {
 
     public function delete(DataWrapperContract $item, ?FieldsContract $fields = null): bool
     {
-        return true;
+        try {
+            $transaction = $item->getOriginal();
+            if (is_null($transaction)) {
+                throw new Exception("Item is null");
+            }
+            return $this->ledgerService->deleteTransaction($transaction->id);
+        } catch (\Exception $e) {
+            throw ValidationException::withMessages([
+                'error' => "Something went wrong",
+            ]);
+        }
     }
 
     public function massDelete(array $ids): void
     {
-        //
+        foreach ($ids as $id) {
+            $this->ledgerService->deleteTransaction((int) $id);
+        }
     }
 }
