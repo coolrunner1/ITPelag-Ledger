@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Transaction\Pages;
 
+use App\MoonShine\Resources\JournalEntry\JournalEntryResource;
 use MoonShine\Laravel\Fields\Relationships\HasMany;
 use MoonShine\Laravel\Fields\Relationships\HasOne;
+use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
 use MoonShine\Laravel\Pages\Crud\DetailPage;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use App\MoonShine\Resources\Transaction\TransactionResource;
 use MoonShine\Support\ListOf;
+use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
+use MoonShine\UI\Fields\Number;
+use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use Throwable;
 
@@ -29,14 +34,22 @@ class TransactionDetailPage extends DetailPage
     {
         return [
             ID::make(),
-            Text::make('Date', 'date'),
+            Date::make('Date', 'date'),
             Text::make('Description', 'description'),
-            Text::make('Created at', 'created_at')->readOnly(),
-            HasMany::make('Journal Entries', 'journalEntries')
+            Date::make('Created at', 'created_at')->readOnly(),
+            RelationRepeater::make(
+                'Journal Entries',
+                'journalEntries',
+                JournalEntryResource::class
+            )
                 ->fields([
-                    Text::make('Amount'),
-                    Text::make('Type'),
+                    Number::make('Amount', 'amount'),
+                    Select::make('Type', 'type')->options([
+                        'debit' => 'Debit',
+                        'credit' => 'Credit',
+                    ]),
                 ])
+
         ];
     }
 

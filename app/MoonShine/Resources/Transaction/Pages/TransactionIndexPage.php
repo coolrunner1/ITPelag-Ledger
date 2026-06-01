@@ -10,6 +10,7 @@ use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\UI\Components\Metrics\Wrapped\Metric;
+use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use App\MoonShine\Resources\Transaction\TransactionResource;
 use MoonShine\Support\ListOf;
@@ -31,9 +32,9 @@ class TransactionIndexPage extends IndexPage
     {
         return [
             ID::make(),
-            Text::make('Date', 'date'),
+            Date::make('Date', 'date'),
             Text::make('Description', 'description'),
-            Text::make('Created at', 'created_at')->readOnly(),
+            Date::make('Created at', 'created_at'),
         ];
     }
 

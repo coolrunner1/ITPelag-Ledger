@@ -6,6 +6,11 @@ use App\Models\JournalEntry;
 
 class JournalEntryRepository extends Repository
 {
+    function getJournalEntries(): iterable
+    {
+        return JournalEntry::all();
+    }
+
     function findJournalEntry(int $id): ?JournalEntry {
         return JournalEntry::find($id);
     }

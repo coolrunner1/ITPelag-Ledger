@@ -15,6 +15,11 @@ class LedgerService extends Service
         private readonly JournalEntryRepository $journalEntryRepository
     ) {}
 
+    function getJournalEntries()
+    {
+        return $this->journalEntryRepository->getJournalEntries();
+    }
+
     function getTransactions(): iterable {
         return $this->transactionRepository->getTransactions();
     }
