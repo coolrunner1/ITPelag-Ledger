@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\JournalEntry;
+use App\DTOs\JournalEntryDTO;
 
 class JournalEntryRepository implements IJournalEntryRepository
 {
@@ -17,5 +18,10 @@ class JournalEntryRepository implements IJournalEntryRepository
 
     function findJournalEntryByTransactionId(int $transactionId): ?JournalEntry {
         return JournalEntry::all()->where('transaction_id', $transactionId)->first();
+    }
+
+    function createJournalEntry(JournalEntryDTO $entry): JournalEntry
+    {
+        return JournalEntry::create($entry->toArray());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTOs\TransactionDTO;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -19,7 +20,7 @@ interface ITransactionRepository
 
     public function getTransaction(int $id): ?Transaction;
 
-    public function createTransaction(Transaction $transaction): Transaction;
+    public function createTransaction(TransactionDTO $transaction): Transaction;
 
     public function updateTransaction(int $id, Transaction $transaction): ?Transaction;
 

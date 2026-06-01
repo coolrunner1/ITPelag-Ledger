@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Collection;
+use App\DTOs\TransactionDTO;
 
 class TransactionRepository implements ITransactionRepository
 {
@@ -31,9 +32,9 @@ class TransactionRepository implements ITransactionRepository
         return Transaction::find($id);
     }
 
-    public function createTransaction(Transaction $transaction): Transaction
+    public function createTransaction(TransactionDTO $transaction): Transaction
     {
-        return Transaction::create($transaction);
+        return Transaction::create($transaction->toArray());
     }
 
     public function updateTransaction(int $id, Transaction $transaction): ?Transaction

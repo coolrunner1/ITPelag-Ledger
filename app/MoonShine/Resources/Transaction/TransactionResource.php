@@ -102,14 +102,14 @@ class TransactionResource extends CrudResource {
                     $journalEntries
                 );
             }
-            // 3. Mark the state flag as successfully instantiated for the MoonShine component layout
+
             $this->isRecentlyCreated = is_null($transactionId);
 
             return new ModelDataWrapper($transaction);
         } catch (Exception $e) {
-            throw new HttpResponseException(
-                response()->json(['message' => $e->getMessage()], 422)
-            );
+            throw ValidationException::withMessages([
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
@@ -122,9 +122,9 @@ class TransactionResource extends CrudResource {
             }
             return $this->ledgerService->deleteTransaction($transaction->id);
         } catch (\Exception $e) {
-            throw new HttpResponseException(
-                response()->json(['message' => $e->getMessage()], 422)
-            );
+            throw ValidationException::withMessages([
+                'error' => $e->getMessage(),
+            ]);
         }
     }
 
