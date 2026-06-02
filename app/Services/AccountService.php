@@ -47,6 +47,9 @@ class AccountService implements IAccountService
 
     function deleteAccount(int $id): bool
     {
-        return $this->accountRepository->deleteAccount($id);
+        if (!$this->accountRepository->deleteAccount($id)) {
+            throw new Exception("Account was not found or has posted transactions");
+        }
+        return true;
     }
 }

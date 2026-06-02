@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\DTOs\AccountDTO;
 use App\Models\Account;
+use Illuminate\Database\Eloquent\Collection;
 
 class AccountRepository implements IAccountRepository
 {
@@ -61,6 +62,31 @@ class AccountRepository implements IAccountRepository
         return $account;
     }
     function deleteAccount(int $id): bool {
-        return Account::destroy($id);
+        $account = Account::find($id);
+
+        if (!$account) {
+            return false;
+        }
+
+        $hasPostedTransactions = $account
+            ->journalEntries()
+            ->whereHas('transaction', function ($q) {
+                $q->where('is_posted', true);
+            })
+            ->exists();
+
+        if ($hasPostedTransactions) {
+            return false;
+        }
+
+        return $account->delete();
+    }
+
+    public function findAccountsWithTransactionsAndJournalEntries(): Collection
+    {
+        return Account::with([
+            'journalEntries.transaction'
+        ])
+            ->get();
     }
 }

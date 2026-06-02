@@ -5,6 +5,7 @@ namespace App\Services;
 use App\DTOs\TransactionDTO;
 use App\DTOs\JournalEntryDTO;
 use App\DTOs\IDTO;
+use App\Models\Account;
 use App\Models\JournalEntry;
 use App\Models\Transaction;
 use App\Repositories\IAccountRepository;
@@ -13,6 +14,7 @@ use App\Repositories\ITransactionRepository;
 use App\Repositories\AccountRepository;
 use App\Repositories\JournalEntryRepository;
 use App\Repositories\TransactionRepository;
+use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
@@ -182,6 +184,124 @@ class LedgerService implements ILedgerService
         if (!$account->is_active) {
             throw new Exception("Account '{$account->name}' ({$account->code}) is currently inactive.");
         }
+    }
+
+    public function getTrialBalance(string $startDate, string $endDate): Collection
+    {
+        $from = Carbon::parse($startDate);
+        $to = Carbon::parse($endDate);
+
+        $totalOpeningDebit = 0;
+        $totalOpeningCredit = 0;
+
+        $totalDebitTurnover = 0;
+        $totalCreditTurnover = 0;
+
+        $totalClosingDebit = 0;
+        $totalClosingCredit = 0;
+
+        $trialBalance = new Collection();
+
+        $accounts = $this->accountRepository->findAccountsWithTransactionsAndJournalEntries();
+
+        foreach ($accounts as $account) {
+
+            $entries = $account->journalEntries
+                ->filter(
+                    fn($e) =>
+                        $e->transaction &&
+                        $e->transaction->is_posted
+                );
+
+            $openingDebitTurnover = $entries
+                ->filter(fn($e) =>
+                    $e->transaction->date <= $from &&
+                    $e->type === 'debit'
+                )
+                ->sum('amount');
+
+            $openingCreditTurnover = $entries
+                ->filter(fn($e) =>
+                    $e->transaction->date <= $from &&
+                    $e->type === 'credit'
+                )
+                ->sum('amount');
+
+            $debitTurnover = $entries
+                ->filter(fn($e) =>
+                    $e->transaction->date >= $from &&
+                    $e->transaction->date <= $to &&
+                    $e->type === 'debit'
+                )
+                ->sum('amount');
+
+            $totalDebitTurnover += $debitTurnover;
+
+            $creditTurnover = $entries
+                ->filter(fn($e) =>
+                    $e->transaction->date > $from &&
+                    $e->transaction->date < $to &&
+                    $e->type === 'credit'
+                )
+                ->sum('amount');
+
+            $totalCreditTurnover += $creditTurnover;
+
+            $openingNet =
+                $openingDebitTurnover -
+                $openingCreditTurnover;
+
+            $openingDebit = max($openingNet, 0);
+
+            $totalOpeningDebit += $openingDebit;
+
+            $openingCredit = abs(min($openingNet, 0));
+
+            $totalOpeningCredit += $openingCredit;
+
+            $closingNet =
+                $openingNet +
+                $debitTurnover -
+                $creditTurnover;
+
+            $closingDebit = max($closingNet, 0);
+
+            $totalClosingDebit += $closingDebit;
+
+            $closingCredit = abs(min($closingNet, 0));
+
+            $totalClosingCredit += $closingCredit;
+
+            $trialBalance->push([
+                'code' => $account->code,
+                'name' => $account->name,
+
+                'opening_debit' => round($openingDebit,2),
+                'opening_credit' => round($openingCredit,2),
+
+                'debit_turnover' => round($debitTurnover,2),
+                'credit_turnover' => round($creditTurnover,2),
+
+                'closing_debit' => round($closingDebit,2),
+                'closing_credit' => round($closingCredit,2),
+            ]);
+        }
+
+        $trialBalance->push([
+            'code' => "",
+            'name' => "",
+
+            'opening_debit' => round($totalOpeningDebit,2),
+            'opening_credit' => round($totalOpeningCredit,2),
+
+            'debit_turnover' => round($totalDebitTurnover,2),
+            'credit_turnover' => round($totalCreditTurnover,2),
+
+            'closing_debit' => round($totalClosingDebit,2),
+            'closing_credit' => round($totalClosingCredit,2),
+        ]);
+
+        return $trialBalance;
     }
 
     public function getTransactionQuery(): Builder {

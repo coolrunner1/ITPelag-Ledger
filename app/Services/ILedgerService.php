@@ -69,4 +69,6 @@ interface ILedgerService
     function getTransactionWithJournalEntries(int $id): ?Transaction;
 
     public function getTransactionQuery(): Builder;
+
+    public function getTrialBalance(string $startDate, string $endDate): Collection;
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Layouts;
 
+use App\MoonShine\Pages\TrialBalance;
 use MoonShine\Laravel\Layouts\AppLayout;
 use MoonShine\ColorManager\Palettes\RetroPalette;
 use MoonShine\ColorManager\ColorManager;
@@ -32,6 +33,7 @@ final class MoonShineLayout extends AppLayout
     {
         return [
             ...parent::menu(),
+            MenuItem::make(TrialBalance::class, 'Trial Balance'),
             MenuItem::make(TransactionResource::class, 'Transactions'),
             MenuItem::make(AccountResource::class, 'Accounts'),
         ];
