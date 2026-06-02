@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction;
 
 use App\DTOs\TransactionDTO;
+use Illuminate\Database\Eloquent\Builder;
+use MoonShine\Contracts\UI\ActionButtonContract;
+use MoonShine\Crud\Handlers\Handler;
+use MoonShine\ImportExport\Contracts\HasImportExportContract;
+use MoonShine\ImportExport\ExportHandler;
 use App\Models\Transaction;
 use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
@@ -18,14 +23,21 @@ use Illuminate\Validation\ValidationException;
 use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
+use MoonShine\ImportExport\Traits\ImportExportConcern;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 use Illuminate\Support\Collection;
 use MoonShine\Contracts\Core\PageContract;
+use MoonShine\Support\ListOf;
+use MoonShine\UI\Components\ActionButton;
+use MoonShine\UI\Fields\Date;
+use MoonShine\UI\Fields\ID;
+use MoonShine\UI\Fields\Text;
 
 /**
  * @extends CrudResource<array, TransactionIndexPage, TransactionFormPage, TransactionDetailPage>
  */
-class TransactionResource extends CrudResource {
+class TransactionResource extends CrudResource implements HasImportExportContract {
+    use ImportExportConcern;
 
     private ILedgerService $ledgerService;
 
@@ -138,5 +150,42 @@ class TransactionResource extends CrudResource {
         foreach ($ids as $id) {
             $this->ledgerService->deleteTransaction((int) $id);
         }
+    }
+
+    public function getQuery(): Builder
+    {
+        return $this->ledgerService->getTransactionQuery();
+    }
+
+    protected function import(): ?Handler
+    {
+        return null;
+    }
+
+    protected function exportFields(): iterable
+    {
+        return [
+            ID::make(),
+            Date::make('Date', 'date'),
+            Text::make('Description', 'description'),
+            Text::make('Is Posted', 'is_posted')
+                ->changePreview(fn($value) => $value ? 'Yes' : 'No'),
+            Date::make('Created at', 'created_at')->readOnly(),
+        ];
+    }
+
+    protected function export(): ?Handler
+    {
+        $handler = ExportHandler::make(__('moonshine::ui.export'))
+            ->notifyUsers(fn() => [auth()->id()])
+            ->disk('public')
+            ->filename(sprintf('export_%s', date('Ymd-His')))
+            ->dir('/exports');
+
+        if (request('filter.export_format') === 'csv') {
+            $handler->csv()->delimiter(',');
+        }
+
+        return $handler;
     }
 }

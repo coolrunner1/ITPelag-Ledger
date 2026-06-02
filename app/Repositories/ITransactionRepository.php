@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\DTOs\TransactionDTO;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
 interface ITransactionRepository
@@ -25,4 +26,5 @@ interface ITransactionRepository
     public function updateTransaction(int $id, TransactionDTO $transactionDTO): ?Transaction;
 
     public function deleteTransaction(int $id): bool;
+    public function getQuery(): Builder;
 }

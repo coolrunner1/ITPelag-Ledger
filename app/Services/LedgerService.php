@@ -14,8 +14,11 @@ use App\Repositories\AccountRepository;
 use App\Repositories\JournalEntryRepository;
 use App\Repositories\TransactionRepository;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Throwable;
+
+use Illuminate\Database\Eloquent\Collection;
 
 class LedgerService implements ILedgerService
 {
@@ -40,7 +43,7 @@ class LedgerService implements ILedgerService
         return $this->accountRepository->findAccountOptions();
     }
 
-    function getTransactions(?string $search, ?string $date, ?string $accountId): iterable
+    function getTransactions(?string $search, ?string $date, ?string $accountId): Collection
     {
         return $this->transactionRepository->findTransactions($search, $date, $accountId);
     }
@@ -179,5 +182,9 @@ class LedgerService implements ILedgerService
         if (!$account->is_active) {
             throw new Exception("Account '{$account->name}' ({$account->code}) is currently inactive.");
         }
+    }
+
+    public function getTransactionQuery(): Builder {
+        return $this->transactionRepository->getQuery();
     }
 }

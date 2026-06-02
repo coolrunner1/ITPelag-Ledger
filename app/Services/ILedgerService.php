@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\DTOs\TransactionDTO;
 use App\Models\Transaction;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 
 interface ILedgerService
 {
@@ -17,12 +19,12 @@ interface ILedgerService
     /**
      * Fetches transactions
      *
-     * @param string|null $search    Search by description
-     * @param string|null $date      Filter by date
+     * @param string|null $search Search by description
+     * @param string|null $date Filter by date
      * @param string|null $accountId Filter by the account id
-     * @return iterable
+     * @return Collection
      */
-    function getTransactions(?string $search, ?string $date, ?string $accountId): iterable;
+    function getTransactions(?string $search, ?string $date, ?string $accountId): Collection;
 
     /**
      * Creates a transaction with journal entries and checks their validity (debit must be equal to credit)
@@ -65,4 +67,6 @@ interface ILedgerService
      * @return Transaction|null
      */
     function getTransactionWithJournalEntries(int $id): ?Transaction;
+
+    public function getTransactionQuery(): Builder;
 }

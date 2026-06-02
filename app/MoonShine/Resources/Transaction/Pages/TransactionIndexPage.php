@@ -6,6 +6,7 @@ namespace App\MoonShine\Resources\Transaction\Pages;
 
 use App\Services\ILedgerService;
 use App\Services\LedgerService;
+use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\UI\Components\Table\TableBuilder;
@@ -70,6 +71,12 @@ class TransactionIndexPage extends IndexPage
                 ->options(
                     $this->ledgerService->getAccountOptions()
                 ),
+            Select::make('Export format', 'export_format')
+                ->nullable()
+                ->options([
+                    'csv' => "Export as CSV",
+                    'xlsx' => "Export as XLSX",
+                ]),
 
         ];
     }

@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Transaction;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use App\DTOs\TransactionDTO;
 
@@ -54,5 +55,10 @@ class TransactionRepository implements ITransactionRepository
     public function deleteTransaction(int $id): bool
     {
         return Transaction::destroy($id);
+    }
+
+    public function getQuery(): Builder
+    {
+        return Transaction::query();
     }
 }
