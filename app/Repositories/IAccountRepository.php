@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\DTOs\AccountDTO;
 use App\Models\Account;
 
 interface IAccountRepository
@@ -12,5 +13,9 @@ interface IAccountRepository
      * @return array
      */
     public function findAccountOptions(): array;
+    public function findAccounts(?string $search, ?string $type, ?string $isActive): iterable;
     public function findAccount(int $id): ?Account;
+    public function createAccount(AccountDTO $data): Account;
+    public function updateAccount(int $id, AccountDTO $data): ?Account;
+    function deleteAccount(int $id): bool;
 }

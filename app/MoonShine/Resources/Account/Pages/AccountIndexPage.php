@@ -10,9 +10,12 @@ use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Laravel\QueryTags\QueryTag;
 use MoonShine\UI\Components\Metrics\Wrapped\Metric;
+use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use App\MoonShine\Resources\Account\AccountResource;
 use MoonShine\Support\ListOf;
+use MoonShine\UI\Fields\Select;
+use MoonShine\UI\Fields\Text;
 use Throwable;
 
 
@@ -30,6 +33,13 @@ class AccountIndexPage extends IndexPage
     {
         return [
             ID::make(),
+            Text::make("Name", "name"),
+            Text::make("Code", "code"),
+            Text::make("Type", "type"),
+            Text::make('Is Active', 'is_active')
+                ->changePreview(fn($value) => $value ? 'Yes' : 'No'),
+            Date::make('Created at', 'created_at'),
+            Date::make('Updated at', 'updated_at'),
         ];
     }
 
@@ -46,7 +56,19 @@ class AccountIndexPage extends IndexPage
      */
     protected function filters(): iterable
     {
-        return [];
+        return [
+            Select::make('Type', 'type')->options([
+                'asset' => 'Asset',
+                'liability' => 'Liability',
+                'equity' => 'Equity',
+                'revenue' => 'Revenue',
+                'expense' => 'Expense',
+            ])->nullable(),
+            Select::make('Is Active', 'is_active')->options([
+                true => 'Yes',
+                false => 'No',
+            ])->nullable(),
+        ];
     }
 
     /**

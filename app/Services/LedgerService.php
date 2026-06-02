@@ -48,12 +48,12 @@ class LedgerService implements ILedgerService
     /**
      * @throws Exception|Throwable
      */
-    public function createTransaction(array $data, array $entries): Transaction
+    public function createTransaction(TransactionDTO $data, array $entries): Transaction
     {
         $this->checkJournalEntriesValidity($entries);
 
         return DB::transaction(function () use ($data, $entries) {
-            $transaction = $this->transactionRepository->createTransaction(TransactionDTO::fromArray($data));
+            $transaction = $this->transactionRepository->createTransaction($data);
 
             foreach ($entries as $entry) {
                 $this->checkAccountValidity((int) $entry['account_id']);
@@ -74,12 +74,12 @@ class LedgerService implements ILedgerService
     /**
      * @throws Throwable
      */
-    public function updateTransaction(int $id, array $data, array $entries): ?Transaction
+    public function updateTransaction(int $id, TransactionDTO $data, array $entries): ?Transaction
     {
         $this->checkJournalEntriesValidity($entries);
 
         return DB::transaction(function () use ($id, $data, $entries) {
-            $transaction = $this->transactionRepository->updateTransaction($id, TransactionDTO::fromArray($data));
+            $transaction = $this->transactionRepository->updateTransaction($id, $data);
 
             if (!$transaction) {
                 throw new Exception("Transaction with id {$id} does not exist or can't be updated.");

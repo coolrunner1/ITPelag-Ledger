@@ -12,8 +12,12 @@ use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use App\MoonShine\Resources\Account\AccountResource;
 use MoonShine\Support\ListOf;
+use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Components\Layout\Box;
+use MoonShine\UI\Fields\Select;
+use MoonShine\UI\Fields\Switcher;
+use MoonShine\UI\Fields\Text;
 use Throwable;
 
 
@@ -22,6 +26,8 @@ use Throwable;
  */
 class AccountFormPage extends FormPage
 {
+    protected bool $isAsync = false;
+
     /**
      * @return list<ComponentContract|FieldContract>
      */
@@ -30,6 +36,17 @@ class AccountFormPage extends FormPage
         return [
             Box::make([
                 ID::make(),
+                Text::make("Name", "name"),
+                Text::make("Code", "code"),
+                Select::make('Type', 'type')->options([
+                    'asset' => 'Asset',
+                    'liability' => 'Liability',
+                    'equity' => 'Equity',
+                    'revenue' => 'Revenue',
+                    'expense' => 'Expense',
+                ]),
+                Switcher::make('Is Active', 'is_active')
+                    ->default(true),
             ]),
         ];
     }
@@ -44,9 +61,14 @@ class AccountFormPage extends FormPage
         return parent::formButtons();
     }
 
-    protected function rules(DataWrapperContract $item): array
+    protected function rules(mixed $item): array
     {
-        return [];
+        return [
+            'name'      => ['required', 'string', 'min:5', 'max:255'],
+            'code'      => ['required', 'string', 'min:1', 'max:255'],
+            'type'      => ['required', 'string'],
+            'is_active' => ['required', 'boolean'],
+        ];
     }
 
     /**

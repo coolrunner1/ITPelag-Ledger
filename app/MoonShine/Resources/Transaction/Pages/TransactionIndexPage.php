@@ -45,6 +45,8 @@ class TransactionIndexPage extends IndexPage
             Date::make('Date', 'date'),
             Text::make('Description', 'description'),
             Date::make('Created at', 'created_at'),
+            Text::make('Is Posted', 'is_posted')
+                ->changePreview(fn($value) => $value ? 'Yes' : 'No')
         ];
     }
 

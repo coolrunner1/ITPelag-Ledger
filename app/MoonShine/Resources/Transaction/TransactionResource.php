@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Transaction;
 
+use App\DTOs\TransactionDTO;
 use App\Models\Transaction;
 use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
@@ -12,7 +13,6 @@ use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 use App\Services\ILedgerService;
 use App\Services\LedgerService;
 use Exception;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use MoonShine\Crud\Resources\CrudResource;
@@ -21,7 +21,6 @@ use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 use Illuminate\Support\Collection;
 use MoonShine\Contracts\Core\PageContract;
-use MoonShine\Support\Enums\ToastType;
 
 /**
  * @extends CrudResource<array, TransactionIndexPage, TransactionFormPage, TransactionDetailPage>
@@ -98,13 +97,13 @@ class TransactionResource extends CrudResource {
         try {
             if (!$transactionId) {
                 $transaction = $this->ledgerService->createTransaction(
-                    $transactionData,
+                    TransactionDTO::fromArray($transactionData),
                     $journalEntries
                 );
             } else {
                 $transaction = $this->ledgerService->updateTransaction(
                     $transactionId,
-                    $transactionData,
+                    TransactionDTO::fromArray($transactionData),
                     $journalEntries
                 );
             }

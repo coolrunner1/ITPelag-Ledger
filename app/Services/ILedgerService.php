@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\DTOs\TransactionDTO;
 use App\Models\Transaction;
 
 interface ILedgerService
@@ -26,11 +27,11 @@ interface ILedgerService
     /**
      * Creates a transaction with journal entries and checks their validity (debit must be equal to credit)
      *
-     * @param array $data Transaction details
+     * @param TransactionDTO $data Transaction details
      * @param array $entries Array of journal entries
      * @return Transaction
      */
-    public function createTransaction(array $data, array $entries): Transaction;
+    public function createTransaction(TransactionDTO $data, array $entries): Transaction;
 
     /**
      * Fetches a transaction
@@ -44,11 +45,11 @@ interface ILedgerService
      * Updates an existing transaction by id with journal entries and checks their validity (debit must be equal to credit)
      *
      * @param int $id The Transaction ID
-     * @param array $data Transaction details
+     * @param TransactionDTO $data Transaction details
      * @param array $entries Array of journal entries
      * @return Transaction|null
      */
-    public function updateTransaction(int $id, array $data, array $entries): ?Transaction;
+    public function updateTransaction(int $id, TransactionDTO $data, array $entries): ?Transaction;
 
     /**
      * Deletes an existing transaction by id
