@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction;
 
 use App\DTOs\TransactionDTO;
-use App\MoonShine\Handlers\XLSXExportHandler;
+use App\MoonShine\Handlers\CustomExportHandler;
 use Illuminate\Database\Eloquent\Builder;
 use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Crud\Handlers\Handler;
@@ -185,7 +185,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
     protected function handlers(): ListOf
     {
         return new ListOf(ExportHandler::class, [
-            XLSXExportHandler::make('Export to Excel')
+            CustomExportHandler::make('Export to Excel')
                 ->icon('cloud-arrow-down')
                 ->notifyUsers(fn() => [auth()->id()])
                 ->disk('public')

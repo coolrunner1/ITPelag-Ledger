@@ -4,7 +4,7 @@ namespace App\MoonShine\Handlers;
 
 use MoonShine\ImportExport\ExportHandler;
 
-class XLSXExportHandler extends ExportHandler
+class CustomExportHandler extends ExportHandler
 {
 
 }
