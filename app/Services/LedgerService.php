@@ -134,11 +134,11 @@ class LedgerService implements ILedgerService
      */
     function deleteTransaction(int $id): bool
     {
-        $transaction = $this->transactionRepository->findTransaction($id);
-        if ($transaction->is_posted) {
-            throw new Exception("Transaction is already posted. You can't delete it.");
+        $transaction = $this->transactionRepository->deleteTransaction($id);
+        if (!$transaction) {
+            throw new Exception("Transaction does not exist or has been already posted.");
         }
-        return $this->transactionRepository->deleteTransaction($id);
+        return true;
     }
 
     function getTransactionWithJournalEntries(int $id): ?Transaction

@@ -54,7 +54,11 @@ class TransactionRepository implements ITransactionRepository
 
     public function deleteTransaction(int $id): bool
     {
-        return Transaction::destroy($id);
+        $transaction = $this->findTransaction($id);
+        if ($transaction->is_posted) {
+            return false;
+        }
+        return $transaction->delete();
     }
 
     public function getQuery(): Builder

@@ -44,7 +44,7 @@ class TrialBalance extends Page
     {
         $from = request()->get(
             'from',
-            now()->startOfMonth()->toDateString()
+            now()->previous()->startOfMonth()->toDateString()
         );
 
         $to = request()->get(
