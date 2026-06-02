@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction;
 
 use App\DTOs\TransactionDTO;
+use App\MoonShine\Handlers\XLSXExportHandler;
 use Illuminate\Database\Eloquent\Builder;
 use MoonShine\Contracts\UI\ActionButtonContract;
 use MoonShine\Crud\Handlers\Handler;
@@ -174,18 +175,31 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
         ];
     }
 
+
+
     protected function export(): ?Handler
     {
-        $handler = ExportHandler::make(__('moonshine::ui.export'))
-            ->notifyUsers(fn() => [auth()->id()])
-            ->disk('public')
-            ->filename(sprintf('export_%s', date('Ymd-His')))
-            ->dir('/exports');
+        return null;
+    }
 
-        if (request('filter.export_format') === 'csv') {
-            $handler->csv()->delimiter(',');
-        }
+    protected function handlers(): ListOf
+    {
+        return new ListOf(ExportHandler::class, [
+            XLSXExportHandler::make('Export to Excel')
+                ->icon('cloud-arrow-down')
+                ->notifyUsers(fn() => [auth()->id()])
+                ->disk('public')
+                ->filename(sprintf('export_%s', date('Ymd-His')))
+                ->dir('/exports'),
 
-        return $handler;
+            ExportHandler::make('Export to CSV')
+                ->icon('document-text')
+                ->notifyUsers(fn() => [auth()->id()])
+                ->disk('public')
+                ->filename(sprintf('export_%s', date('Ymd-His')))
+                ->dir('/exports')
+                ->csv()
+                ->delimiter(',')
+        ]);
     }
 }

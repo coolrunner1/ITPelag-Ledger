@@ -71,13 +71,6 @@ class TransactionIndexPage extends IndexPage
                 ->options(
                     $this->ledgerService->getAccountOptions()
                 ),
-            Select::make('Export format', 'export_format')
-                ->nullable()
-                ->options([
-                    'csv' => "Export as CSV",
-                    'xlsx' => "Export as XLSX",
-                ]),
-
         ];
     }
 
