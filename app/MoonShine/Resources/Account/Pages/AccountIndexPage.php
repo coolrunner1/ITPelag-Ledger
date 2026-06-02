@@ -17,6 +17,7 @@ use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use Throwable;
+use const App\Constants\ACCOUNT_TYPE_OPTIONS;
 
 
 /**
@@ -57,13 +58,7 @@ class AccountIndexPage extends IndexPage
     protected function filters(): iterable
     {
         return [
-            Select::make('Type', 'type')->options([
-                'asset' => 'Asset',
-                'liability' => 'Liability',
-                'equity' => 'Equity',
-                'revenue' => 'Revenue',
-                'expense' => 'Expense',
-            ])->nullable(),
+            Select::make('Type', 'type')->options(ACCOUNT_TYPE_OPTIONS)->nullable(),
             Select::make('Is Active', 'is_active')->options([
                 true => 'Yes',
                 false => 'No',

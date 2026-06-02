@@ -5,27 +5,25 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Transaction\Pages;
 
 use App\MoonShine\Resources\JournalEntry\JournalEntryResource;
+use App\MoonShine\Resources\Transaction\TransactionResource;
 use App\Services\ILedgerService;
 use App\Services\LedgerService;
-use MoonShine\Laravel\Fields\Relationships\HasMany;
+use MoonShine\Contracts\UI\ComponentContract;
+use MoonShine\Contracts\UI\FieldContract;
+use MoonShine\Contracts\UI\FormBuilderContract;
 use MoonShine\Laravel\Fields\Relationships\RelationRepeater;
 use MoonShine\Laravel\Pages\Crud\FormPage;
-use MoonShine\Contracts\UI\ComponentContract;
-use MoonShine\Contracts\UI\FormBuilderContract;
-use MoonShine\UI\Components\Badge;
-use MoonShine\UI\Components\FormBuilder;
-use MoonShine\Contracts\UI\FieldContract;
-use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
-use App\MoonShine\Resources\Transaction\TransactionResource;
 use MoonShine\Support\ListOf;
+use MoonShine\UI\Components\FormBuilder;
+use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
-use MoonShine\UI\Components\Layout\Box;
 use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use Throwable;
+use const App\Constants\JOURNAL_ENTRY_TYPE_OPTIONS;
 
 
 /**
@@ -39,7 +37,8 @@ class TransactionFormPage extends FormPage
 
     public function __construct(
         LedgerService $ledgerService,
-    ) {
+    )
+    {
         $this->ledgerService = $ledgerService;
     }
 
@@ -66,10 +65,7 @@ class TransactionFormPage extends FormPage
                             ->default(1.0)
                             ->step(0.01)
                             ->min(0.00),
-                        Select::make('Type', 'type')->options([
-                            'debit' => 'Debit',
-                            'credit' => 'Credit',
-                        ]),
+                        Select::make('Type', 'type')->options(JOURNAL_ENTRY_TYPE_OPTIONS),
                         Select::make('Account', 'account_id')->options(
                             $this->ledgerService->getAccountOptions()
                         )->nullable()
@@ -91,7 +87,7 @@ class TransactionFormPage extends FormPage
     protected function rules(mixed $item): array
     {
         return [
-            'date'        => ['required', 'date_format:Y-m-d'],
+            'date' => ['required', 'date_format:Y-m-d'],
             'description' => ['required', 'string', 'min:5', 'max:255'],
             'journalEntries.*.amount' => ['required', 'numeric', 'gt:0'],
             'journalEntries.*.account_id' => ['required', 'integer', 'exists:accounts,id'],
@@ -108,7 +104,7 @@ class TransactionFormPage extends FormPage
     }
 
     /**
-     * @param  FormBuilder  $component
+     * @param FormBuilder $component
      *
      * @return FormBuilder
      */

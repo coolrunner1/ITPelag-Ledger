@@ -19,6 +19,7 @@ use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
 use Throwable;
+use const App\Constants\ACCOUNT_TYPE_OPTIONS;
 
 
 /**
@@ -38,13 +39,7 @@ class AccountFormPage extends FormPage
                 ID::make(),
                 Text::make("Name", "name"),
                 Text::make("Code", "code"),
-                Select::make('Type', 'type')->options([
-                    'asset' => 'Asset',
-                    'liability' => 'Liability',
-                    'equity' => 'Equity',
-                    'revenue' => 'Revenue',
-                    'expense' => 'Expense',
-                ]),
+                Select::make('Type', 'type')->options(ACCOUNT_TYPE_OPTIONS),
                 Switcher::make('Is Active', 'is_active')
                     ->default(true),
             ]),
