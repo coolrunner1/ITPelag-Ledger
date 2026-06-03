@@ -7,10 +7,7 @@ use App\DTOs\UpdateAccountDTO;
 use App\Exceptions\CustomValidationException;
 use App\Models\Account;
 use App\Repositories\IAccountRepository;
-use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
-use MoonShine\Crud\Exceptions\NotFoundException;
-use Nette\Schema\ValidationException;
 use const App\Constants\ACTIVE_ACCOUNT_TYPES;
 
 class AccountService implements IAccountService

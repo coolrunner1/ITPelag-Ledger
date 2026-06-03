@@ -60,7 +60,7 @@ class AccountFormPage extends FormPage
     {
         return [
             'name'      => ['required', 'string', 'min:5', 'max:255'],
-            'code'      => ['required', 'string', 'min:1', 'max:255'],
+            'code'      => ['required', 'string', 'min:1', 'max:255', 'unique:accounts,code'],
             'type'      => ['required', 'string'],
             'is_active' => ['required', 'boolean'],
         ];

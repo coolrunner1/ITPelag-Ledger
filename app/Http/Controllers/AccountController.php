@@ -27,7 +27,7 @@ class AccountController extends Controller
         $validator = Validator::make(request()->query(), [
             'search'     => ['nullable', 'string'],
             'type'       => ['nullable', 'string'],
-            'isActive'   => ['nullable', 'boolean'],
+            'isActive'   => ['nullable', 'string'],
         ]);
 
         $validated = $validator->validate();
@@ -35,7 +35,7 @@ class AccountController extends Controller
         return $this->accountService->getAccounts(
             search: $validated['search'] ?? null,
             type: $validated['type'] ?? null,
-            isActive: $validated['is_active'] ?? null
+            isActive: $validated['isActive'] ?? null
         );
     }
 

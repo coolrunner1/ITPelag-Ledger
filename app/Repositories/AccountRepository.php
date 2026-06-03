@@ -35,7 +35,7 @@ class AccountRepository implements IAccountRepository
                 $query->where('type', $type);
             })
             ->when($isActive, function ($query, $isActive) {
-                $query->where('is_active', $isActive);
+                $query->where('is_active', $isActive === 'true');
             })
             ->latest('updated_at')
             ->get();

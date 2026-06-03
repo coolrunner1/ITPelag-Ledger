@@ -59,9 +59,9 @@ class AccountIndexPage extends IndexPage
     {
         return [
             Select::make('Type', 'type')->options(ACCOUNT_TYPE_OPTIONS)->nullable(),
-            Select::make('Is Active', 'is_active')->options([
-                true => 'Yes',
-                false => 'No',
+            Select::make('Is Active', 'isActive')->options([
+                "true" => 'Yes',
+                "false" => 'No',
             ])->nullable(),
         ];
     }

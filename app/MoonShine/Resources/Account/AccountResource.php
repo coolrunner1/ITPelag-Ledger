@@ -56,12 +56,13 @@ class AccountResource extends CrudResource
     {
         $validator = Validator::make(request()->input('filter', []), [
             'type' => ['nullable', 'string'],
-            'is_active' => ['nullable', 'boolean'],
+            'isActive' => ['nullable', 'string'],
         ]);
 
         if ($validator->fails()) {
             return new Collection([]);
         }
+
 
         $validated = $validator->validated();
 
@@ -70,7 +71,7 @@ class AccountResource extends CrudResource
         return $this->accountService->getAccounts(
             $search,
             type: $validated['type'] ?? null,
-            isActive: $validated['is_active'] ?? null
+            isActive: $validated['isActive'] ?? null
         );
     }
 
