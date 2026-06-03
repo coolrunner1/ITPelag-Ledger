@@ -75,5 +75,12 @@ interface ILedgerService
      */
     function getTransactionWithJournalEntries(int $id): ?Transaction;
 
+    /**
+     * Generate the trial balance report within the specified date range.
+     *
+     * @param string $startDate The starting date filter boundary (e.g., 'Y-m-d').
+     * @param string $endDate The ending date filter boundary (e.g., 'Y-m-d').
+     * @return Collection Collection of account balances containing calculated debits and credits.
+     */
     public function getTrialBalance(string $startDate, string $endDate): Collection;
 }
