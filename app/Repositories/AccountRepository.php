@@ -90,4 +90,15 @@ class AccountRepository implements IAccountRepository
         ])
             ->get();
     }
+
+    public function getPostedTotals(Account $account): array
+    {
+        $baseQuery = $account->journalEntries()
+            ->whereHas('transaction', fn($q) => $q->where('is_posted', true));
+
+        return [
+            'debit'  => (clone $baseQuery)->where('type', 'debit')->sum('amount'),
+            'credit' => (clone $baseQuery)->where('type', 'credit')->sum('amount'),
+        ];
+    }
 }

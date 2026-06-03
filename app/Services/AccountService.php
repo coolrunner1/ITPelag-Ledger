@@ -9,6 +9,7 @@ use App\Repositories\AccountRepository;
 use App\Repositories\IAccountRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use const App\Constants\ACTIVE_ACCOUNT_TYPES;
 
 class AccountService implements IAccountService
 {
@@ -28,9 +29,22 @@ class AccountService implements IAccountService
         return $this->accountRepository->createAccount($data);
     }
 
-    function getAccount(int $id): ?Account
+    function getAccount(int $id, ?bool $showBalance): ?Account
     {
-        return $this->accountRepository->findAccount($id);
+        $account = $this->accountRepository->findAccount($id);
+
+        if (!$account) {
+            throw new ModelNotFoundException("Account was not found");
+        }
+
+        if ($showBalance) {
+            $account->setAttribute(
+                'balance',
+                $this->calculateBalance($account)
+            );
+        }
+
+        return $account;
     }
 
     /**
@@ -53,5 +67,18 @@ class AccountService implements IAccountService
             throw new Exception("Account was not found or has posted transactions");
         }
         return true;
+    }
+
+    private function calculateBalance(Account $account): float
+    {
+        $totals = $this->accountRepository->getPostedTotals($account);
+
+        $hasNormalDebitBalance = in_array($account->type, ACTIVE_ACCOUNT_TYPES);
+
+        $balance = $hasNormalDebitBalance
+            ? $totals['debit'] - $totals['credit']
+            : $totals['credit'] - $totals['debit'];
+
+        return round($balance, 2);
     }
 }

@@ -87,7 +87,7 @@ class AccountResource extends CrudResource
     {
         $id = $this->getItemID();
 
-        $account = $this->accountService->getAccount(intval($id));
+        $account = $this->accountService->getAccount(intval($id), true);
 
         if (!$account) {
             return null;

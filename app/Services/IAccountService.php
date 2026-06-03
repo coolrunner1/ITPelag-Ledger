@@ -6,6 +6,7 @@ use App\DTOs\CreateAccountDTO;
 use App\DTOs\UpdateAccountDTO;
 use App\Models\Account;
 use App\Models\Transaction;
+use Exception;
 
 interface IAccountService
 {
@@ -30,10 +31,11 @@ interface IAccountService
     /**
      * Fetches an account
      *
-     * @param  int              $id The Account ID
+     * @param int $id The Account ID
+     * @param bool|null $showBalance
      * @return Account|null
      */
-    function getAccount(int $id): ?Account;
+    function getAccount(int $id, ?bool $showBalance): ?Account;
 
     /**
      * Updates an existing account by id
@@ -48,6 +50,7 @@ interface IAccountService
      * Deletes an existing account by id
      *
      * @param int $id The Transaction ID
+     * @throws Exception
      */
     function deleteAccount(int $id): bool;
 }

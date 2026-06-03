@@ -175,7 +175,7 @@ class LedgerService implements ILedgerService
      * @throws Exception
      */
     private function checkAccountValidity(int $id): void {
-        $account = $this->accountRepository->findAccount($id);
+        $account = $this->accountRepository->findAccount($id, false);
 
         if (!$account) {
             throw new Exception("Accounting Error: Account ID {$id} does not exist.");

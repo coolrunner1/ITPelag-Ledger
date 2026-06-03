@@ -67,18 +67,24 @@ class AccountController extends Controller
      */
     public function show(int $id)
     {
-        $account = $this->accountService->getAccount($id);
-
-        if (is_null($account)) {
-            return response()->json([
-                'message' => 'Account was not found'
-            ], 404);
-        }
-
-        return response()->json([
-            ...$account->toArray(),
-            'balance' => $account->balance,
+        $validator = Validator::make(request()->query(), [
+            'showBalance'   => ['nullable', 'boolean'],
         ]);
+
+        $validated = $validator->validate();
+
+        try {
+            return $this->accountService->getAccount($id, $validated["showBalance"] ?? null);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**

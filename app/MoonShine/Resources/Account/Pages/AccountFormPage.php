@@ -15,6 +15,7 @@ use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
 use MoonShine\UI\Components\Layout\Box;
+use MoonShine\UI\Fields\Number;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Switcher;
 use MoonShine\UI\Fields\Text;
@@ -40,6 +41,7 @@ class AccountFormPage extends FormPage
                 Text::make("Name", "name"),
                 Text::make("Code", "code"),
                 Select::make('Type', 'type')->options(ACCOUNT_TYPE_OPTIONS),
+                Number::make('Balance', 'balance')->readonly(),
                 Switcher::make('Is Active', 'is_active')
                     ->default(true),
             ]),
