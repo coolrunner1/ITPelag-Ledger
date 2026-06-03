@@ -143,7 +143,7 @@ class LedgerService implements ILedgerService
         $debit = 0;
         $credit = 0;
 
-        if (empty($entries)) {
+        if (count($entries) < 2) {
             throw new Exception("There must be at least two entries: credit and debit.");
         }
 
@@ -168,7 +168,7 @@ class LedgerService implements ILedgerService
         $account = $this->accountRepository->findAccount($id, false);
 
         if (!$account) {
-            throw new Exception("Accounting Error: Account ID {$id} does not exist.");
+            throw new ModelNotFoundException("Accounting Error: Account ID {$id} does not exist.");
         }
 
         if (!$account->is_active) {
@@ -216,7 +216,7 @@ class LedgerService implements ILedgerService
 
             $debitTurnover = $entries
                 ->filter(fn($e) => $e->transaction->date >= $from &&
-                    $e->transaction->date <= $to &&
+                    $e->transaction->date < $to &&
                     $e->type === 'debit'
                 )
                 ->sum('amount');

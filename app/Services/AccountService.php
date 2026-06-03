@@ -8,6 +8,7 @@ use App\Models\Account;
 use App\Repositories\IAccountRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Nette\Schema\ValidationException;
 use const App\Constants\ACTIVE_ACCOUNT_TYPES;
 
 class AccountService implements IAccountService
@@ -66,7 +67,7 @@ class AccountService implements IAccountService
         $hasPostedTransactions = $this->accountRepository->checkPostedTransaction($account);
 
         if ($hasPostedTransactions) {
-            throw new Exception("Account has posted transactions");
+            throw new ValidationException("Account has posted transactions");
         }
 
         return $this->accountRepository->deleteAccount($account);

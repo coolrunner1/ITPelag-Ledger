@@ -31,7 +31,6 @@ class CreateTransactionRequest extends FormRequest
 
             'journalEntries' => ['required', 'array', 'min:2'],
 
-            'journalEntries.*.transaction_id' => ['required', 'integer', 'exists:transactions,id'],
             'journalEntries.*.account_id'     => ['required', 'integer', 'exists:accounts,id'],
             'journalEntries.*.amount'         => ['required', 'numeric', 'min:0'],
             'journalEntries.*.type'           => ['required', 'string', Rule::in(JOURNAL_ENTRY_TYPES)],
