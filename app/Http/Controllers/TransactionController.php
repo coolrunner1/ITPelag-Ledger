@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Validator;
 class TransactionController extends Controller
 {
     public function __construct(
-        ILedgerService $ledgerService,
+        private readonly ILedgerService $ledgerService,
     ) {}
 
     /**
