@@ -3,38 +3,27 @@
 namespace App\Services;
 
 use App\DTOs\CreateTransactionDTO;
-use App\DTOs\UpdateTransactionDTO;
 use App\DTOs\JournalEntryDTO;
+use App\DTOs\UpdateTransactionDTO;
 use App\Models\Transaction;
 use App\Repositories\IAccountRepository;
 use App\Repositories\IJournalEntryRepository;
 use App\Repositories\ITransactionRepository;
-use App\Repositories\AccountRepository;
-use App\Repositories\JournalEntryRepository;
-use App\Repositories\TransactionRepository;
 use Carbon\Carbon;
 use Exception;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-
-use Illuminate\Database\Eloquent\Collection;
 
 class LedgerService implements ILedgerService
 {
 
-    private ITransactionRepository  $transactionRepository;
-    private IJournalEntryRepository $journalEntryRepository;
-    private IAccountRepository      $accountRepository;
-
     public function __construct(
-        TransactionRepository  $transactionRepository,
-        JournalEntryRepository $journalEntryRepository,
-        AccountRepository      $accountRepository,
+        private readonly ITransactionRepository  $transactionRepository,
+        private readonly IJournalEntryRepository $journalEntryRepository,
+        private readonly IAccountRepository      $accountRepository,
     )
     {
-        $this->transactionRepository = $transactionRepository;
-        $this->journalEntryRepository = $journalEntryRepository;
-        $this->accountRepository = $accountRepository;
     }
 
     function getAccountOptions(): array
@@ -55,7 +44,7 @@ class LedgerService implements ILedgerService
             $transaction = $this->transactionRepository->createTransaction($data);
 
             foreach ($entries as $entry) {
-                $this->checkAccountValidity((int) $entry['account_id']);
+                $this->checkAccountValidity((int)$entry['account_id']);
 
                 $entry['transaction_id'] = $transaction->id;
                 $this->journalEntryRepository->createJournalEntry(JournalEntryDTO::fromArray($entry));
@@ -90,7 +79,7 @@ class LedgerService implements ILedgerService
             $oldEntries = $this->journalEntryRepository->findJournalEntriesByTransactionId($id);
 
             $submittedIds = collect($entries)
-                ->map(fn($entry) => isset($entry['id']) && !empty($entry['id']) ? (int) $entry['id'] : null)
+                ->map(fn($entry) => isset($entry['id']) && !empty($entry['id']) ? (int)$entry['id'] : null)
                 ->filter()
                 ->toArray();
 
@@ -107,9 +96,9 @@ class LedgerService implements ILedgerService
             }
 
             foreach ($entries as $entry) {
-                $this->checkAccountValidity((int) $entry['account_id']);
+                $this->checkAccountValidity((int)$entry['account_id']);
 
-                $entryId = isset($entry['id']) ? (int) $entry['id'] : null;
+                $entryId = isset($entry['id']) ? (int)$entry['id'] : null;
                 $journalEntry = null;
 
                 $entry['transaction_id'] = $transaction->id;
@@ -174,7 +163,8 @@ class LedgerService implements ILedgerService
     /**
      * @throws Exception
      */
-    private function checkAccountValidity(int $id): void {
+    private function checkAccountValidity(int $id): void
+    {
         $account = $this->accountRepository->findAccount($id, false);
 
         if (!$account) {
@@ -208,28 +198,24 @@ class LedgerService implements ILedgerService
 
             $entries = $account->journalEntries
                 ->filter(
-                    fn($e) =>
-                        $e->transaction &&
+                    fn($e) => $e->transaction &&
                         $e->transaction->is_posted
                 );
 
             $openingDebitTurnover = $entries
-                ->filter(fn($e) =>
-                    $e->transaction->date <= $from &&
+                ->filter(fn($e) => $e->transaction->date <= $from &&
                     $e->type === 'debit'
                 )
                 ->sum('amount');
 
             $openingCreditTurnover = $entries
-                ->filter(fn($e) =>
-                    $e->transaction->date <= $from &&
+                ->filter(fn($e) => $e->transaction->date <= $from &&
                     $e->type === 'credit'
                 )
                 ->sum('amount');
 
             $debitTurnover = $entries
-                ->filter(fn($e) =>
-                    $e->transaction->date >= $from &&
+                ->filter(fn($e) => $e->transaction->date >= $from &&
                     $e->transaction->date <= $to &&
                     $e->type === 'debit'
                 )
@@ -238,8 +224,7 @@ class LedgerService implements ILedgerService
             $totalDebitTurnover += $debitTurnover;
 
             $creditTurnover = $entries
-                ->filter(fn($e) =>
-                    $e->transaction->date > $from &&
+                ->filter(fn($e) => $e->transaction->date > $from &&
                     $e->transaction->date < $to &&
                     $e->type === 'credit'
                 )
@@ -276,14 +261,14 @@ class LedgerService implements ILedgerService
                 'code' => $account->code,
                 'name' => $account->name,
 
-                'opening_debit' => round($openingDebit,2),
-                'opening_credit' => round($openingCredit,2),
+                'opening_debit' => round($openingDebit, 2),
+                'opening_credit' => round($openingCredit, 2),
 
-                'debit_turnover' => round($debitTurnover,2),
-                'credit_turnover' => round($creditTurnover,2),
+                'debit_turnover' => round($debitTurnover, 2),
+                'credit_turnover' => round($creditTurnover, 2),
 
-                'closing_debit' => round($closingDebit,2),
-                'closing_credit' => round($closingCredit,2),
+                'closing_debit' => round($closingDebit, 2),
+                'closing_credit' => round($closingCredit, 2),
             ]);
         }
 
@@ -291,14 +276,14 @@ class LedgerService implements ILedgerService
             'code' => "",
             'name' => "",
 
-            'opening_debit' => round($totalOpeningDebit,2),
-            'opening_credit' => round($totalOpeningCredit,2),
+            'opening_debit' => round($totalOpeningDebit, 2),
+            'opening_credit' => round($totalOpeningCredit, 2),
 
-            'debit_turnover' => round($totalDebitTurnover,2),
-            'credit_turnover' => round($totalCreditTurnover,2),
+            'debit_turnover' => round($totalDebitTurnover, 2),
+            'credit_turnover' => round($totalCreditTurnover, 2),
 
-            'closing_debit' => round($totalClosingDebit,2),
-            'closing_credit' => round($totalClosingCredit,2),
+            'closing_debit' => round($totalClosingDebit, 2),
+            'closing_credit' => round($totalClosingCredit, 2),
         ]);
 
         return $trialBalance;

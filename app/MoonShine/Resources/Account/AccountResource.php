@@ -5,30 +5,21 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Account;
 
 use App\DTOs\CreateAccountDTO;
-use App\DTOs\CreateTransactionDTO;
 use App\DTOs\UpdateAccountDTO;
-use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
-use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
-use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
-use App\Services\AccountService;
-use App\Services\IAccountService;
-use App\Services\ILedgerService;
-use App\Services\LedgerService;
-use Exception;
-use Illuminate\Database\Eloquent\Model;
 use App\Models\Account;
-use App\MoonShine\Resources\Account\Pages\AccountIndexPage;
-use App\MoonShine\Resources\Account\Pages\AccountFormPage;
 use App\MoonShine\Resources\Account\Pages\AccountDetailPage;
-
+use App\MoonShine\Resources\Account\Pages\AccountFormPage;
+use App\MoonShine\Resources\Account\Pages\AccountIndexPage;
+use App\Services\IAccountService;
+use Exception;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
+use MoonShine\Contracts\Core\PageContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
 use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Laravel\Resources\ModelResource;
-use MoonShine\Contracts\Core\PageContract;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
 
 /**
@@ -36,13 +27,12 @@ use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
  */
 class AccountResource extends CrudResource
 {
-    private IAccountService $accountService;
-
     public function __construct(
-        AccountService $accountService,
-    ) {
-        $this->accountService = $accountService;
+        private readonly IAccountService $accountService,
+    )
+    {
     }
+
     protected ?string $casterKeyName = 'id';
 
     protected string $title = 'Accounts';
@@ -58,14 +48,15 @@ class AccountResource extends CrudResource
             AccountDetailPage::class,
         ];
     }
+
     /**
      * @return iterable
      */
     public function getItems(): iterable
     {
         $validator = Validator::make(request()->input('filter', []), [
-            'type'       => ['nullable', 'string'],
-            'is_active'  => ['nullable', 'boolean'],
+            'type' => ['nullable', 'string'],
+            'is_active' => ['nullable', 'boolean'],
         ]);
 
         if ($validator->fails()) {
@@ -98,7 +89,7 @@ class AccountResource extends CrudResource
 
     public function save(DataWrapperContract $item, ?FieldsContract $fields = null): DataWrapperContract
     {
-        $accountId   = $this->getItemID() ? (int) $this->getItemID() : null;
+        $accountId = $this->getItemID() ? (int)$this->getItemID() : null;
         $accountData = request()->only(['name', 'code', 'type', 'is_active']);
 
         try {
@@ -141,7 +132,7 @@ class AccountResource extends CrudResource
     public function massDelete(array $ids): void
     {
         foreach ($ids as $id) {
-            $this->accountService->deleteAccount((int) $id);
+            $this->accountService->deleteAccount((int)$id);
         }
     }
 

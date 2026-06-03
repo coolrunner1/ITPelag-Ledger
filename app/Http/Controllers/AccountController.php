@@ -7,7 +7,6 @@ use App\DTOs\UpdateAccountDTO;
 use App\Http\Requests\CreateAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
-use App\Services\AccountService;
 use App\Services\IAccountService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -15,13 +14,10 @@ use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
-    private IAccountService $accountService;
-
     public function __construct(
-        AccountService $accountService,
-    ) {
-        $this->accountService = $accountService;
-    }
+        private readonly IAccountService $accountService,
+    ) {}
+
     /**
      * Display a listing of the resource.
      */

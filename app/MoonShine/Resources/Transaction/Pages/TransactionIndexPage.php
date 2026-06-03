@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Transaction\Pages;
 
+use App\MoonShine\Resources\Transaction\TransactionResource;
 use App\Services\ILedgerService;
-use App\Services\LedgerService;
 use MoonShine\Contracts\UI\ActionButtonContract;
-use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Contracts\UI\ComponentContract;
-use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\Contracts\UI\FieldContract;
+use MoonShine\Laravel\Pages\Crud\IndexPage;
 use MoonShine\Laravel\QueryTags\QueryTag;
+use MoonShine\Support\ListOf;
 use MoonShine\UI\Components\Metrics\Wrapped\Metric;
+use MoonShine\UI\Components\Table\TableBuilder;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
-use App\MoonShine\Resources\Transaction\TransactionResource;
-use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Select;
 use MoonShine\UI\Fields\Text;
 use Throwable;
@@ -29,11 +28,10 @@ class TransactionIndexPage extends IndexPage
 {
     protected bool $isLazy = true;
 
-    private ILedgerService $ledgerService;
     public function __construct(
-        LedgerService $ledgerService,
-    ) {
-        $this->ledgerService = $ledgerService;
+        private readonly ILedgerService $ledgerService,
+    )
+    {
     }
 
     /**
@@ -91,7 +89,7 @@ class TransactionIndexPage extends IndexPage
     }
 
     /**
-     * @param  TableBuilder  $component
+     * @param TableBuilder $component
      *
      * @return TableBuilder
      */

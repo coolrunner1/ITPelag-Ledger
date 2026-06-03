@@ -8,7 +8,6 @@ use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Transaction;
 use App\Services\ILedgerService;
-use App\Services\LedgerService;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
@@ -16,13 +15,9 @@ use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
-    private ILedgerService $ledgerService;
-
     public function __construct(
-        LedgerService $ledgerService,
-    ) {
-        $this->ledgerService = $ledgerService;
-    }
+        ILedgerService $ledgerService,
+    ) {}
 
     /**
      * Display a listing of the resource.

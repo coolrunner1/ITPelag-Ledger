@@ -7,7 +7,6 @@ namespace App\MoonShine\Resources\Transaction\Pages;
 use App\MoonShine\Resources\JournalEntry\JournalEntryResource;
 use App\MoonShine\Resources\Transaction\TransactionResource;
 use App\Services\ILedgerService;
-use App\Services\LedgerService;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Contracts\UI\FieldContract;
 use MoonShine\Contracts\UI\FormBuilderContract;
@@ -33,14 +32,10 @@ class TransactionFormPage extends FormPage
 {
     protected bool $isAsync = false;
     protected bool $errorsAbove = true;
-    private ILedgerService $ledgerService;
 
     public function __construct(
-        LedgerService $ledgerService,
-    )
-    {
-        $this->ledgerService = $ledgerService;
-    }
+        private readonly ILedgerService $ledgerService,
+    ) {}
 
     /**
      * @return list<ComponentContract|FieldContract>

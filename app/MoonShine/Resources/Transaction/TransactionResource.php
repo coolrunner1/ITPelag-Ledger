@@ -8,25 +8,24 @@ use App\DTOs\CreateTransactionDTO;
 use App\DTOs\UpdateTransactionDTO;
 use App\Models\Transaction;
 use App\MoonShine\Handlers\CustomExportHandler;
-use Illuminate\Database\Eloquent\Builder;
-use MoonShine\Crud\Handlers\Handler;
-use MoonShine\ImportExport\Contracts\HasImportExportContract;
-use MoonShine\ImportExport\ExportHandler;
-use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
-use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
+use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
+use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
 use App\Services\ILedgerService;
-use App\Services\LedgerService;
 use Exception;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
-use MoonShine\Crud\Resources\CrudResource;
 use MoonShine\Contracts\Core\DependencyInjection\FieldsContract;
+use MoonShine\Contracts\Core\PageContract;
 use MoonShine\Contracts\Core\TypeCasts\DataWrapperContract;
+use MoonShine\Crud\Handlers\Handler;
+use MoonShine\Crud\Resources\CrudResource;
+use MoonShine\ImportExport\Contracts\HasImportExportContract;
+use MoonShine\ImportExport\ExportHandler;
 use MoonShine\ImportExport\Traits\ImportExportConcern;
 use MoonShine\Laravel\TypeCasts\ModelDataWrapper;
-use Illuminate\Support\Collection;
-use MoonShine\Contracts\Core\PageContract;
 use MoonShine\Support\ListOf;
 use MoonShine\UI\Fields\Date;
 use MoonShine\UI\Fields\ID;
@@ -35,16 +34,16 @@ use MoonShine\UI\Fields\Text;
 /**
  * @extends CrudResource<array, TransactionIndexPage, TransactionFormPage, TransactionDetailPage>
  */
-class TransactionResource extends CrudResource implements HasImportExportContract {
+class TransactionResource extends CrudResource implements HasImportExportContract
+{
     use ImportExportConcern;
 
-    private ILedgerService $ledgerService;
-
     public function __construct(
-        LedgerService $ledgerService,
-    ) {
-        $this->ledgerService = $ledgerService;
+        private readonly ILedgerService $ledgerService,
+    )
+    {
     }
+
     protected ?string $casterKeyName = 'id';
 
     protected string $title = 'Transactions';
@@ -67,7 +66,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
     public function getItems(): iterable
     {
         $validator = Validator::make(request()->input('filter', []), [
-            'date'       => ['nullable', 'date_format:Y-m-d'],
+            'date' => ['nullable', 'date_format:Y-m-d'],
             'account_id' => ['nullable', 'integer', 'exists:accounts,id'],
         ]);
 
@@ -102,9 +101,9 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
 
     public function save(DataWrapperContract $item, ?FieldsContract $fields = null): DataWrapperContract
     {
-        $transactionId   = $this->getItemID() ? (int) $this->getItemID() : null;
+        $transactionId = $this->getItemID() ? (int)$this->getItemID() : null;
         $transactionData = request()->only(['date', 'description', 'is_posted']);
-        $journalEntries  = request()->input('journalEntries', []);
+        $journalEntries = request()->input('journalEntries', []);
 
         try {
             if (!$transactionId) {
@@ -148,7 +147,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
     public function massDelete(array $ids): void
     {
         foreach ($ids as $id) {
-            $this->ledgerService->deleteTransaction((int) $id);
+            $this->ledgerService->deleteTransaction((int)$id);
         }
     }
 

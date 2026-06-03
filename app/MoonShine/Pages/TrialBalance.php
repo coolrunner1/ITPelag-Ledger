@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\MoonShine\Pages;
 
 use App\Services\ILedgerService;
-use App\Services\LedgerService;
 use MoonShine\Laravel\Pages\Page;
 use MoonShine\Contracts\UI\ComponentContract;
 use MoonShine\Support\Enums\FormMethod;
@@ -17,11 +16,7 @@ use MoonShine\UI\Fields\Text;
 
 class TrialBalance extends Page
 {
-    private ILedgerService $ledgerService;
-
-    public function __construct(LedgerService $ledgerService) {
-        $this->ledgerService = $ledgerService;
-    }
+    public function __construct(private readonly ILedgerService $ledgerService) {}
     /**
      * @return array<string, string>
      */

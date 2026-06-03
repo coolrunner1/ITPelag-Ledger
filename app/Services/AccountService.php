@@ -5,7 +5,6 @@ namespace App\Services;
 use App\DTOs\CreateAccountDTO;
 use App\DTOs\UpdateAccountDTO;
 use App\Models\Account;
-use App\Repositories\AccountRepository;
 use App\Repositories\IAccountRepository;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -13,10 +12,8 @@ use const App\Constants\ACTIVE_ACCOUNT_TYPES;
 
 class AccountService implements IAccountService
 {
-    private IAccountRepository $accountRepository;
-
-    public function __construct(AccountRepository $accountRepository) {
-        $this->accountRepository = $accountRepository;
+    public function __construct(private readonly IAccountRepository $accountRepository)
+    {
     }
 
     function getAccounts(?string $search, ?string $type, ?string $isActive): iterable
