@@ -109,6 +109,5 @@ If you prefer Docker, ensure Docker is installed and run:
 ```
 ## REST API
 
-Detailed project documentation is available here:
-
-📄 https://github.com/coolrunner1/ITPelag-Ledger/blob/main/Ledger-documentation.html
+Documentation is available here:
+[Documentation](https://coolrunner1.github.io/ITPelag-Ledger/)
