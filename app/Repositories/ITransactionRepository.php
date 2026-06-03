@@ -2,7 +2,8 @@
 
 namespace App\Repositories;
 
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
 use App\Models\Transaction;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -21,10 +22,15 @@ interface ITransactionRepository
 
     public function findTransaction(int $id): ?Transaction;
 
-    public function createTransaction(TransactionDTO $transaction): Transaction;
+    public function findTransactionWithJournalEntries(int $id): ?Transaction;
 
-    public function updateTransaction(int $id, TransactionDTO $transactionDTO): ?Transaction;
+    public function createTransaction(CreateTransactionDTO $transaction): Transaction;
 
-    public function deleteTransaction(int $id): bool;
-    public function getQuery(): Builder;
+    public function updateTransaction(Transaction $transaction, UpdateTransactionDTO $transactionDTO): ?Transaction;
+
+    public function updateTransactionById(int $id, UpdateTransactionDTO $transactionDTO): ?Transaction;
+
+    public function deleteTransaction(Transaction $transaction): bool;
+
+    public function deleteTransactionById(int $id): bool;
 }

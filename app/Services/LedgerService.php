@@ -2,11 +2,9 @@
 
 namespace App\Services;
 
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
 use App\DTOs\JournalEntryDTO;
-use App\DTOs\IDTO;
-use App\Models\Account;
-use App\Models\JournalEntry;
 use App\Models\Transaction;
 use App\Repositories\IAccountRepository;
 use App\Repositories\IJournalEntryRepository;
@@ -16,9 +14,8 @@ use App\Repositories\JournalEntryRepository;
 use App\Repositories\TransactionRepository;
 use Carbon\Carbon;
 use Exception;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
-use Throwable;
 
 use Illuminate\Database\Eloquent\Collection;
 
@@ -50,10 +47,7 @@ class LedgerService implements ILedgerService
         return $this->transactionRepository->findTransactions($search, $date, $accountId);
     }
 
-    /**
-     * @throws Exception|Throwable
-     */
-    public function createTransaction(TransactionDTO $data, array $entries): Transaction
+    public function createTransaction(CreateTransactionDTO $data, array $entries): Transaction
     {
         $this->checkJournalEntriesValidity($entries);
 
@@ -76,19 +70,22 @@ class LedgerService implements ILedgerService
         return $this->transactionRepository->findTransaction($id);
     }
 
-    /**
-     * @throws Throwable
-     */
-    public function updateTransaction(int $id, TransactionDTO $data, array $entries): ?Transaction
+    public function updateTransaction(int $id, UpdateTransactionDTO $data, array $entries): ?Transaction
     {
         $this->checkJournalEntriesValidity($entries);
 
         return DB::transaction(function () use ($id, $data, $entries) {
-            $transaction = $this->transactionRepository->updateTransaction($id, $data);
+            $transaction = $this->transactionRepository->findTransaction($id);
 
             if (!$transaction) {
-                throw new Exception("Transaction with id {$id} does not exist or can't be updated.");
+                throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
             }
+
+            if ($transaction->is_posted) {
+                throw new Exception("Transaction with id {$id} can't be updated.");
+            }
+
+            $transaction = $this->transactionRepository->updateTransaction($transaction, $data);
 
             $oldEntries = $this->journalEntryRepository->findJournalEntriesByTransactionId($id);
 
@@ -129,21 +126,24 @@ class LedgerService implements ILedgerService
         });
     }
 
-    /**
-     * @throws Exception
-     */
-    function deleteTransaction(int $id): bool
+    public function deleteTransaction(int $id): bool
     {
-        $transaction = $this->transactionRepository->deleteTransaction($id);
+        $transaction = $this->transactionRepository->findTransaction($id);
+
         if (!$transaction) {
-            throw new Exception("Transaction does not exist or has been already posted.");
+            throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
         }
-        return true;
+
+        if ($transaction->is_posted) {
+            throw new Exception("Transaction with id {$id} has been already posted.");
+        }
+
+        return $this->transactionRepository->deleteTransaction($transaction);
     }
 
     function getTransactionWithJournalEntries(int $id): ?Transaction
     {
-        return $this->transactionRepository->findTransaction($id);
+        return $this->transactionRepository->findTransactionWithJournalEntries($id);
     }
 
     /**
@@ -302,9 +302,5 @@ class LedgerService implements ILedgerService
         ]);
 
         return $trialBalance;
-    }
-
-    public function getTransactionQuery(): Builder {
-        return $this->transactionRepository->getQuery();
     }
 }

@@ -79,7 +79,6 @@ class AccountController extends Controller
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
-
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),
@@ -128,6 +127,10 @@ class AccountController extends Controller
             $this->accountService->deleteAccount($id);
 
             return response()->noContent();
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
         } catch (Exception $e) {
             return response()->json([
                 'message' => $e->getMessage(),

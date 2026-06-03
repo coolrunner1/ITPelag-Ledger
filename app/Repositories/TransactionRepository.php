@@ -6,7 +6,8 @@ use App\Models\Transaction;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
 
 class TransactionRepository implements ITransactionRepository
 {
@@ -26,7 +27,8 @@ class TransactionRepository implements ITransactionRepository
                 });
             })
             ->latest('date')
-            ->get();
+            ->get()
+            ->makeHidden(['journalEntries']);
     }
 
     public function findTransaction(int $id): ?Transaction
@@ -34,35 +36,44 @@ class TransactionRepository implements ITransactionRepository
         return Transaction::find($id);
     }
 
-    public function createTransaction(TransactionDTO $transaction): Transaction
+    public function findTransactionWithJournalEntries(int $id): ?Transaction
+    {
+        return Transaction::query()
+            ->with(['journalEntries'])
+            ->when($id, function ($query, $id) {
+                $query->where('id', $id);
+            })
+            ->first();
+    }
+
+    public function createTransaction(CreateTransactionDTO $transaction): Transaction
     {
         return Transaction::create($transaction->toArray());
     }
 
-    public function updateTransaction(int $id, TransactionDTO $transactionDTO): ?Transaction
+    public function updateTransaction(Transaction $transaction, UpdateTransactionDTO $transactionDTO): ?Transaction
+    {
+        $transaction->update($transactionDTO->toArray());
+
+        return $transaction;
+    }
+
+    public function updateTransactionById(int $id, UpdateTransactionDTO $transactionDTO): ?Transaction
     {
         $transaction = $this->findTransaction($id);
-
-        if (!$transaction || $transaction->is_posted) {
-            return null;
-        }
 
         $transaction->update($transactionDTO->toArray());
 
         return $transaction;
     }
 
-    public function deleteTransaction(int $id): bool
+    public function deleteTransaction(Transaction $transaction): bool
     {
-        $transaction = $this->findTransaction($id);
-        if ($transaction->is_posted) {
-            return false;
-        }
         return $transaction->delete();
     }
 
-    public function getQuery(): Builder
+    public function deleteTransactionById(int $id): bool
     {
-        return Transaction::query();
+        return Transaction::destroy($id);
     }
 }

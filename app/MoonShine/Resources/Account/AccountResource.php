@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\MoonShine\Resources\Account;
 
 use App\DTOs\CreateAccountDTO;
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
 use App\DTOs\UpdateAccountDTO;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
@@ -63,23 +63,23 @@ class AccountResource extends CrudResource
      */
     public function getItems(): iterable
     {
-        $filterData = request()->input('filter', []);
-
-        $validator = Validator::make($filterData, [
+        $validator = Validator::make(request()->input('filter', []), [
             'type'       => ['nullable', 'string'],
-            'is_active' => ['nullable', 'boolean'],
+            'is_active'  => ['nullable', 'boolean'],
         ]);
 
         if ($validator->fails()) {
             return new Collection([]);
         }
 
+        $validated = $validator->validated();
+
         $search = request()->input('search');
 
         return $this->accountService->getAccounts(
             $search,
-            type: $filterData['type'] ?? null,
-            isActive: $filterData['is_active'] ?? null
+            type: $validated['type'] ?? null,
+            isActive: $validated['is_active'] ?? null
         );
     }
 

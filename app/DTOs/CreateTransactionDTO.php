@@ -4,7 +4,7 @@ namespace App\DTOs;
 
 use Illuminate\Http\Request;
 
-final readonly class TransactionDTO implements IDTO
+final readonly class CreateTransactionDTO implements IDTO
 {
     public function __construct(
         public string $date,
@@ -23,15 +23,26 @@ final readonly class TransactionDTO implements IDTO
 
     public static function fromRequest(Request $request): self
     {
-        return self::fromArray($request->validated());
+        $validated = $request->validated();
+
+        if (!isset($validated['is_posted'])) {
+            $validated['is_posted'] = false;
+        }
+
+        return self::fromArray($validated);
     }
 
     public function toArray(): array
     {
-        return [
+        $arr = [
             'date' => $this->date,
             'description' => $this->description,
-            'is_posted' => $this->isPosted,
         ];
+
+        if ($this->isPosted !== null) {
+            $arr['is_posted'] = $this->isPosted;
+        }
+
+        return $arr;
     }
 }

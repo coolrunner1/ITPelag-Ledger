@@ -2,17 +2,46 @@
 
 namespace App\Http\Controllers;
 
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
+use App\Http\Requests\CreateTransactionRequest;
+use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Transaction;
+use App\Services\ILedgerService;
+use App\Services\LedgerService;
+use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
 {
+    private ILedgerService $ledgerService;
+
+    public function __construct(
+        LedgerService $ledgerService,
+    ) {
+        $this->ledgerService = $ledgerService;
+    }
+
     /**
      * Display a listing of the resource.
      */
     public function index()
     {
-        //
+        $validator = Validator::make(request()->query(), [
+            'search'     => ['nullable', 'string'],
+            'date'       => ['nullable', 'date_format:Y-m-d'],
+            'accountId'  => ['nullable', 'integer', 'exists:accounts,id'],
+        ]);
+
+        $validated = $validator->validated();
+
+        return $this->ledgerService->getTransactions(
+            search: $validated['search'] ?? null,
+            date: $validated['date'] ?? null,
+            accountId: $validated['accountId'] ?? null
+        );
     }
 
     /**
@@ -26,17 +55,38 @@ class TransactionController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(CreateTransactionRequest $request)
     {
-        //
+        try {
+            $account = $this->ledgerService->createTransaction(
+                CreateTransactionDTO::fromRequest($request),
+                $request->journalEntries
+            );
+            return response()->json($account);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Transaction $transaction)
+    public function show(int $id)
     {
-        //
+        try {
+            return $this->ledgerService->getTransactionWithJournalEntries($id);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
@@ -50,16 +100,44 @@ class TransactionController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Transaction $transaction)
+    public function update(UpdateTransactionRequest $request, int $id)
     {
-        //
+        try {
+            $account = $this->ledgerService->updateTransaction(
+                $id,
+                UpdateTransactionDTO::fromRequest($request),
+                $request->journalEntries
+            );
+            return response()->json($account);
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Transaction $transaction)
+    public function destroy(int $id)
     {
-        //
+        try {
+            $this->ledgerService->deleteTransaction($id);
+
+            return response()->noContent();
+        } catch (ModelNotFoundException $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 404);
+        } catch (Exception $e) {
+            return response()->json([
+                'message' => $e->getMessage(),
+            ], 500);
+        }
     }
 }

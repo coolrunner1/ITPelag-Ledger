@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
 use App\Models\Transaction;
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Throwable;
 
 interface ILedgerService
 {
@@ -29,11 +33,12 @@ interface ILedgerService
     /**
      * Creates a transaction with journal entries and checks their validity (debit must be equal to credit)
      *
-     * @param TransactionDTO $data Transaction details
+     * @param CreateTransactionDTO $data Transaction details
      * @param array $entries Array of journal entries
      * @return Transaction
+     * @throws Exception|Throwable
      */
-    public function createTransaction(TransactionDTO $data, array $entries): Transaction;
+    public function createTransaction(CreateTransactionDTO $data, array $entries): Transaction;
 
     /**
      * Fetches a transaction
@@ -47,16 +52,17 @@ interface ILedgerService
      * Updates an existing transaction by id with journal entries and checks their validity (debit must be equal to credit)
      *
      * @param int $id The Transaction ID
-     * @param TransactionDTO $data Transaction details
+     * @param UpdateTransactionDTO $data Transaction details
      * @param array $entries Array of journal entries
      * @return Transaction|null
      */
-    public function updateTransaction(int $id, TransactionDTO $data, array $entries): ?Transaction;
+    public function updateTransaction(int $id, UpdateTransactionDTO $data, array $entries): ?Transaction;
 
     /**
      * Deletes an existing transaction by id
      *
      * @param int $id The Transaction ID
+     * @throws Exception|ModelNotFoundException|Throwable
      */
     function deleteTransaction(int $id): bool;
 
@@ -65,10 +71,9 @@ interface ILedgerService
      *
      * @param  int              $id The Transaction ID
      * @return Transaction|null
+     * @throws Exception|ModelNotFoundException
      */
     function getTransactionWithJournalEntries(int $id): ?Transaction;
-
-    public function getTransactionQuery(): Builder;
 
     public function getTrialBalance(string $startDate, string $endDate): Collection;
 }

@@ -47,9 +47,6 @@ class AccountService implements IAccountService
         return $account;
     }
 
-    /**
-     * @throws Exception
-     */
     public function updateAccount(int $id, UpdateAccountDTO $data): ?Account
     {
         $account = $this->accountRepository->updateAccount($id, $data);
@@ -63,10 +60,19 @@ class AccountService implements IAccountService
 
     function deleteAccount(int $id): bool
     {
-        if (!$this->accountRepository->deleteAccount($id)) {
-            throw new Exception("Account was not found or has posted transactions");
+        $account = $this->accountRepository->findAccount($id);
+
+        if (!$account) {
+            throw new ModelNotFoundException("Account was not found");
         }
-        return true;
+
+        $hasPostedTransactions = $this->accountRepository->checkPostedTransaction($account);
+
+        if ($hasPostedTransactions) {
+            throw new Exception("Account has posted transactions");
+        }
+
+        return $this->accountRepository->deleteAccount($account);
     }
 
     private function calculateBalance(Account $account): float

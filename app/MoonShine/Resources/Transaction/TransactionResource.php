@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Transaction;
 
-use App\DTOs\TransactionDTO;
+use App\DTOs\CreateTransactionDTO;
+use App\DTOs\UpdateTransactionDTO;
+use App\Models\Transaction;
 use App\MoonShine\Handlers\CustomExportHandler;
 use Illuminate\Database\Eloquent\Builder;
 use MoonShine\Crud\Handlers\Handler;
@@ -64,9 +66,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
      */
     public function getItems(): iterable
     {
-        $filterData = request()->input('filter', []);
-
-        $validator = Validator::make($filterData, [
+        $validator = Validator::make(request()->input('filter', []), [
             'date'       => ['nullable', 'date_format:Y-m-d'],
             'account_id' => ['nullable', 'integer', 'exists:accounts,id'],
         ]);
@@ -75,12 +75,15 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
             return new Collection([]);
         }
 
+        $validated = $validator->validated();
+
+
         $search = request()->input('search');
 
         return $this->ledgerService->getTransactions(
             $search,
-            date: $filterData['date'] ?? null,
-            accountId: $filterData['account_id'] ?? null
+            date: $validated['date'] ?? null,
+            accountId: $validated['account_id'] ?? null
         );
     }
 
@@ -106,13 +109,13 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
         try {
             if (!$transactionId) {
                 $transaction = $this->ledgerService->createTransaction(
-                    TransactionDTO::fromArray($transactionData),
+                    CreateTransactionDTO::fromArray($transactionData),
                     $journalEntries
                 );
             } else {
                 $transaction = $this->ledgerService->updateTransaction(
                     $transactionId,
-                    TransactionDTO::fromArray($transactionData),
+                    UpdateTransactionDTO::fromArray($transactionData),
                     $journalEntries
                 );
             }
@@ -135,7 +138,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
                 throw new Exception("Item is null");
             }
             return $this->ledgerService->deleteTransaction($transaction->id);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             throw ValidationException::withMessages([
                 'error' => $e->getMessage(),
             ]);
@@ -151,7 +154,7 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
 
     public function getQuery(): Builder
     {
-        return $this->ledgerService->getTransactionQuery();
+        return Transaction::query();
     }
 
     protected function import(): ?Handler
@@ -170,8 +173,6 @@ class TransactionResource extends CrudResource implements HasImportExportContrac
             Date::make('Created at', 'created_at')->readOnly(),
         ];
     }
-
-
 
     protected function export(): ?Handler
     {

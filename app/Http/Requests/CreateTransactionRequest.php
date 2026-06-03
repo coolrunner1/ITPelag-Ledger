@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class CreateTransactionRequest extends FormRequest
 {
@@ -12,7 +13,7 @@ class CreateTransactionRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +24,17 @@ class CreateTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'date'        => ['required', 'date'],
+            'description' => ['required', 'string','min:5', 'max:255'],
+            'is_posted'   => ['nullable', 'boolean'],
+
+            'journalEntries' => ['required', 'array', 'min:2'],
+
+            'journalEntries.*.transaction_id' => ['required', 'integer', 'exists:transactions,id'],
+            'journalEntries.*.account_id'     => ['required', 'integer', 'exists:accounts,id'],
+            'journalEntries.*.amount'         => ['required', 'numeric', 'min:0'],
+            'journalEntries.*.type'           => ['required', 'string', Rule::in(['debit', 'credit'])],
+
         ];
     }
 }

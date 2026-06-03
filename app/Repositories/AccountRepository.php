@@ -62,25 +62,12 @@ class AccountRepository implements IAccountRepository
 
         return $account;
     }
-    function deleteAccount(int $id): bool {
-        $account = Account::find($id);
 
-        if (!$account) {
-            return false;
-        }
-
-        $hasPostedTransactions = $account
-            ->journalEntries()
-            ->whereHas('transaction', function ($q) {
-                $q->where('is_posted', true);
-            })
-            ->exists();
-
-        if ($hasPostedTransactions) {
-            return false;
-        }
-
+    function deleteAccount(Account $account): bool {
         return $account->delete();
+    }
+    function deleteAccountById(int $id): bool {
+        return Account::destroy($id);
     }
 
     public function findAccountsWithTransactionsAndJournalEntries(): Collection
@@ -100,5 +87,15 @@ class AccountRepository implements IAccountRepository
             'debit'  => (clone $baseQuery)->where('type', 'debit')->sum('amount'),
             'credit' => (clone $baseQuery)->where('type', 'credit')->sum('amount'),
         ];
+    }
+
+    public function checkPostedTransaction(Account $account): bool
+    {
+        return $account
+            ->journalEntries()
+            ->whereHas('transaction', function ($q) {
+                $q->where('is_posted', true);
+            })
+            ->exists();
     }
 }
