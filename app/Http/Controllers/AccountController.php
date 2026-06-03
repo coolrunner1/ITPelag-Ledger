@@ -75,7 +75,10 @@ class AccountController extends Controller
             ], 404);
         }
 
-        return $account;
+        return response()->json([
+            ...$account->toArray(),
+            'balance' => $account->balance,
+        ]);
     }
 
     /**
