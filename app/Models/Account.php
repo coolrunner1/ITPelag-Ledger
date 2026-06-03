@@ -24,7 +24,6 @@ class Account extends Model
 
     public function getBalanceAttribute(): float
     {
-        error_log("G");
         $baseQuery = $this->journalEntries()
             ->whereHas(
                 'transaction',

@@ -4,7 +4,7 @@ namespace App\DTOs;
 
 use Illuminate\Http\Request;
 
-final readonly class AccountDTO implements IDTO
+final readonly class CreateAccountDTO implements IDTO
 {
     public function __construct(
         public string $name,
@@ -25,16 +25,27 @@ final readonly class AccountDTO implements IDTO
 
     public static function fromRequest(Request $request): self
     {
-        return self::fromArray($request->validated());
+        $validated = $request->validated();
+
+        if (!isset($validated['is_active'])) {
+            $validated['is_active'] = true;
+        }
+
+        return self::fromArray($validated);
     }
 
     public function toArray(): array
     {
-        return [
+        $arr = [
             'name' => $this->name,
             'code' => $this->code,
             'type' => $this->type,
-            'isActive' => $this->isActive,
         ];
+
+        if ($this->isActive !== null) {
+            $arr['is_active'] = $this->isActive;
+        }
+
+        return $arr;
     }
 }

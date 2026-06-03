@@ -2,11 +2,13 @@
 
 namespace App\Services;
 
-use App\DTOs\AccountDTO;
+use App\DTOs\CreateAccountDTO;
+use App\DTOs\UpdateAccountDTO;
 use App\Models\Account;
 use App\Repositories\AccountRepository;
 use App\Repositories\IAccountRepository;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class AccountService implements IAccountService
 {
@@ -21,7 +23,7 @@ class AccountService implements IAccountService
         return $this->accountRepository->findAccounts($search, $type, $isActive);
     }
 
-    public function createAccount(AccountDTO $data): Account
+    public function createAccount(CreateAccountDTO $data): Account
     {
         return $this->accountRepository->createAccount($data);
     }
@@ -34,12 +36,12 @@ class AccountService implements IAccountService
     /**
      * @throws Exception
      */
-    public function updateAccount(int $id, AccountDTO $data): ?Account
+    public function updateAccount(int $id, UpdateAccountDTO $data): ?Account
     {
         $account = $this->accountRepository->updateAccount($id, $data);
 
         if (!$account) {
-            throw new Exception("Account was not found");
+            throw new ModelNotFoundException("Account was not found");
         }
 
         return $account;

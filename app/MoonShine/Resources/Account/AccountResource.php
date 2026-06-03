@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace App\MoonShine\Resources\Account;
 
-use App\DTOs\AccountDTO;
+use App\DTOs\CreateAccountDTO;
 use App\DTOs\TransactionDTO;
+use App\DTOs\UpdateAccountDTO;
 use App\MoonShine\Resources\Transaction\Pages\TransactionDetailPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionFormPage;
 use App\MoonShine\Resources\Transaction\Pages\TransactionIndexPage;
@@ -103,12 +104,12 @@ class AccountResource extends CrudResource
         try {
             if (!$accountId) {
                 $account = $this->accountService->createAccount(
-                    AccountDTO::fromArray($accountData),
+                    CreateAccountDTO::fromArray($accountData),
                 );
             } else {
                 $account = $this->accountService->updateAccount(
                     $accountId,
-                    AccountDTO::fromArray($accountData),
+                    UpdateAccountDTO::fromArray($accountData),
                 );
             }
 

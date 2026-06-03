@@ -2,7 +2,8 @@
 
 namespace App\Services;
 
-use App\DTOs\AccountDTO;
+use App\DTOs\CreateAccountDTO;
+use App\DTOs\UpdateAccountDTO;
 use App\Models\Account;
 use App\Models\Transaction;
 
@@ -21,10 +22,10 @@ interface IAccountService
     /**
      * Creates a new account
      *
-     * @param AccountDTO $data Account details
+     * @param CreateAccountDTO $data Account details
      * @return Account
      */
-    public function createAccount(AccountDTO $data): Account;
+    public function createAccount(CreateAccountDTO $data): Account;
 
     /**
      * Fetches an account
@@ -38,10 +39,10 @@ interface IAccountService
      * Updates an existing account by id
      *
      * @param int $id The account ID
-     * @param AccountDTO $data Account details
+     * @param UpdateAccountDTO $data Account details
      * @return Account|null Updated account
      */
-    public function updateAccount(int $id, AccountDTO $data): ?Account;
+    public function updateAccount(int $id, UpdateAccountDTO $data): ?Account;
 
     /**
      * Deletes an existing account by id

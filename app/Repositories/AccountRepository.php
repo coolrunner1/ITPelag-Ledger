@@ -2,7 +2,8 @@
 
 namespace App\Repositories;
 
-use App\DTOs\AccountDTO;
+use App\DTOs\CreateAccountDTO;
+use App\DTOs\UpdateAccountDTO;
 use App\Models\Account;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -45,11 +46,11 @@ class AccountRepository implements IAccountRepository
         return Account::find($id);
     }
 
-    public function createAccount(AccountDTO $data): Account {
+    public function createAccount(CreateAccountDTO $data): Account {
         return Account::create($data->toArray());
     }
 
-    public function updateAccount(int $id, AccountDTO $data): ?Account
+    public function updateAccount(int $id, UpdateAccountDTO $data): ?Account
     {
         $account = $this->findAccount($id);
 
