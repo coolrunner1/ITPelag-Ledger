@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use const App\Constants\ACCOUNT_TYPES;
 
 class CreateAccountRequest extends FormRequest
 {
@@ -34,13 +35,7 @@ class CreateAccountRequest extends FormRequest
 
             'type' => [
                 'required',
-                Rule::in([
-                    'asset',
-                    'liability',
-                    'equity',
-                    'revenue',
-                    'expense',
-                ]),
+                Rule::in(ACCOUNT_TYPES),
             ],
 
             'is_active' => ['nullable', 'boolean'],

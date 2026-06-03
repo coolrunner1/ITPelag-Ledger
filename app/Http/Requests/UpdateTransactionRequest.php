@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use const App\Constants\JOURNAL_ENTRY_TYPES;
 
 class UpdateTransactionRequest extends FormRequest
 {
@@ -34,7 +35,7 @@ class UpdateTransactionRequest extends FormRequest
             'journalEntries.*.transaction_id' => ['required', 'integer', 'exists:transactions,id'],
             'journalEntries.*.account_id'     => ['required', 'integer', 'exists:accounts,id'],
             'journalEntries.*.amount'         => ['required', 'numeric', 'min:0'],
-            'journalEntries.*.type'           => ['required', 'string', Rule::in(['debit', 'credit'])],
+            'journalEntries.*.type'           => ['required', 'string', Rule::in(JOURNAL_ENTRY_TYPES)],
 
         ];
     }

@@ -2,6 +2,8 @@
 
 namespace App\Constants;
 
+const ACCOUNT_TYPES = ['asset', 'expense', 'liability', 'equity', 'revenue'];
+
 const ACTIVE_ACCOUNT_TYPES = ['asset', 'expense'];
 const PASSIVE_ACCOUNT_TYPES = ['liability', 'equity', 'revenue'];
 
