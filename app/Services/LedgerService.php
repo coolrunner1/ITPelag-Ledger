@@ -5,15 +5,14 @@ namespace App\Services;
 use App\DTOs\CreateTransactionDTO;
 use App\DTOs\JournalEntryDTO;
 use App\DTOs\UpdateTransactionDTO;
-use App\Exceptions\CustomNotFoundException;
 use App\Exceptions\CustomValidationException;
 use App\Models\Transaction;
 use App\Repositories\IAccountRepository;
 use App\Repositories\IJournalEntryRepository;
 use App\Repositories\ITransactionRepository;
 use Carbon\Carbon;
-use Exception;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class LedgerService implements ILedgerService
@@ -68,7 +67,7 @@ class LedgerService implements ILedgerService
             $transaction = $this->transactionRepository->findTransaction($id);
 
             if (!$transaction) {
-                throw new CustomNotFoundException("Transaction with id {$id} does not exist.");
+                throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
             }
 
             if ($transaction->is_posted) {
@@ -121,7 +120,7 @@ class LedgerService implements ILedgerService
         $transaction = $this->transactionRepository->findTransaction($id);
 
         if (!$transaction) {
-            throw new CustomNotFoundException("Transaction with id {$id} does not exist.");
+            throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
         }
 
         if ($transaction->is_posted) {
@@ -133,7 +132,13 @@ class LedgerService implements ILedgerService
 
     function getTransactionWithJournalEntries(int $id): ?Transaction
     {
-        return $this->transactionRepository->findTransactionWithJournalEntries($id);
+        $transaction = $this->transactionRepository->findTransactionWithJournalEntries($id);
+
+        if (!$transaction) {
+            throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
+        }
+
+        return $transaction;
     }
 
     /**
@@ -171,7 +176,7 @@ class LedgerService implements ILedgerService
         $account = $this->accountRepository->findAccount($id, false);
 
         if (!$account) {
-            throw new CustomNotFoundException("Accounting Error: Account ID {$id} does not exist.");
+            throw new ModelNotFoundException("Accounting Error: Account ID {$id} does not exist.");
         }
 
         if (!$account->is_active) {

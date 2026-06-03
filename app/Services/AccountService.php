@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\DTOs\CreateAccountDTO;
 use App\DTOs\UpdateAccountDTO;
-use App\Exceptions\CustomNotFoundException;
 use App\Exceptions\CustomValidationException;
 use App\Models\Account;
 use App\Repositories\IAccountRepository;
@@ -35,7 +34,7 @@ class AccountService implements IAccountService
         $account = $this->accountRepository->findAccount($id);
 
         if (!$account) {
-            throw new CustomNotFoundException("Account was not found");
+            throw new ModelNotFoundException("Account was not found");
         }
 
         if ($showBalance) {
@@ -53,7 +52,7 @@ class AccountService implements IAccountService
         $account = $this->accountRepository->updateAccount($id, $data);
 
         if (!$account) {
-            throw new CustomNotFoundException("Account was not found");
+            throw new ModelNotFoundException("Account was not found");
         }
 
         return $account;
@@ -64,7 +63,7 @@ class AccountService implements IAccountService
         $account = $this->accountRepository->findAccount($id);
 
         if (!$account) {
-            throw new CustomNotFoundException("Account was not found");
+            throw new ModelNotFoundException("Account was not found");
         }
 
         $hasPostedTransactions = $this->accountRepository->checkPostedTransaction($account);

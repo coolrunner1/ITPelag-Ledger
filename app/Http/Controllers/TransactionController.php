@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\DTOs\CreateTransactionDTO;
 use App\DTOs\UpdateTransactionDTO;
-use App\Exceptions\CustomNotFoundException;
 use App\Exceptions\CustomValidationException;
 use App\Http\Requests\CreateTransactionRequest;
 use App\Http\Requests\UpdateTransactionRequest;
 use App\Models\Transaction;
 use App\Services\ILedgerService;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller
@@ -77,7 +77,7 @@ class TransactionController extends Controller
     {
         try {
             return $this->ledgerService->getTransactionWithJournalEntries($id);
-        } catch (CustomNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
@@ -130,7 +130,7 @@ class TransactionController extends Controller
             $this->ledgerService->deleteTransaction($id);
 
             return response()->noContent();
-        } catch (CustomNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);

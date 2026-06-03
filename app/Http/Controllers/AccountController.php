@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use App\DTOs\CreateAccountDTO;
 use App\DTOs\UpdateAccountDTO;
-use App\Exceptions\CustomNotFoundException;
 use App\Exceptions\CustomValidationException;
 use App\Http\Requests\CreateAccountRequest;
 use App\Http\Requests\UpdateAccountRequest;
 use App\Models\Account;
 use App\Services\IAccountService;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
@@ -72,7 +72,7 @@ class AccountController extends Controller
 
         try {
             return $this->accountService->getAccount($id, $validated["showBalance"] ?? null);
-        } catch (CustomNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
@@ -102,7 +102,7 @@ class AccountController extends Controller
                 UpdateAccountDTO::fromRequest($request)
             );
             return response()->json($account);
-        } catch (CustomNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);
@@ -123,7 +123,7 @@ class AccountController extends Controller
             $this->accountService->deleteAccount($id);
 
             return response()->noContent();
-        } catch (CustomNotFoundException $e) {
+        } catch (ModelNotFoundException $e) {
             return response()->json([
                 'message' => $e->getMessage(),
             ], 404);

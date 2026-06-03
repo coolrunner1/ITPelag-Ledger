@@ -4,10 +4,10 @@ namespace App\Services;
 
 use App\DTOs\CreateAccountDTO;
 use App\DTOs\UpdateAccountDTO;
-use App\Exceptions\CustomNotFoundException;
 use App\Models\Account;
 use App\Models\Transaction;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 interface IAccountService
 {
@@ -35,7 +35,7 @@ interface IAccountService
      * @param int $id The Account ID
      * @param bool|null $showBalance
      * @return Account|null
-     * @throws CustomNotFoundException
+     * @throws ModelNotFoundException
      */
     function getAccount(int $id, ?bool $showBalance): ?Account;
 
@@ -45,7 +45,7 @@ interface IAccountService
      * @param int $id The account ID
      * @param UpdateAccountDTO $data Account details
      * @return Account|null Updated account
-     * @throws CustomNotFoundException
+     * @throws ModelNotFoundException
      */
     public function updateAccount(int $id, UpdateAccountDTO $data): ?Account;
 
@@ -53,7 +53,7 @@ interface IAccountService
      * Deletes an existing account by id
      *
      * @param int $id The Transaction ID
-     * @throws CustomNotFoundException
+     * @throws ModelNotFoundException
      */
     function deleteAccount(int $id): bool;
 }
