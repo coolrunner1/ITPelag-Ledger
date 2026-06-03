@@ -4,6 +4,8 @@ namespace App\Services;
 
 use App\DTOs\CreateTransactionDTO;
 use App\DTOs\UpdateTransactionDTO;
+use App\Exceptions\CustomNotFoundException;
+use App\Exceptions\CustomValidationException;
 use App\Models\Transaction;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -62,7 +64,7 @@ interface ILedgerService
      * Deletes an existing transaction by id
      *
      * @param int $id The Transaction ID
-     * @throws Exception|ModelNotFoundException|Throwable
+     * @throws CustomValidationException|CustomNotFoundException|Throwable
      */
     function deleteTransaction(int $id): bool;
 
@@ -71,7 +73,7 @@ interface ILedgerService
      *
      * @param  int              $id The Transaction ID
      * @return Transaction|null
-     * @throws Exception|ModelNotFoundException
+     * @throws CustomNotFoundException|CustomValidationException
      */
     function getTransactionWithJournalEntries(int $id): ?Transaction;
 

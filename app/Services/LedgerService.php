@@ -5,6 +5,8 @@ namespace App\Services;
 use App\DTOs\CreateTransactionDTO;
 use App\DTOs\JournalEntryDTO;
 use App\DTOs\UpdateTransactionDTO;
+use App\Exceptions\CustomNotFoundException;
+use App\Exceptions\CustomValidationException;
 use App\Models\Transaction;
 use App\Repositories\IAccountRepository;
 use App\Repositories\IJournalEntryRepository;
@@ -12,7 +14,6 @@ use App\Repositories\ITransactionRepository;
 use Carbon\Carbon;
 use Exception;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
 
 class LedgerService implements ILedgerService
@@ -67,11 +68,11 @@ class LedgerService implements ILedgerService
             $transaction = $this->transactionRepository->findTransaction($id);
 
             if (!$transaction) {
-                throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
+                throw new CustomNotFoundException("Transaction with id {$id} does not exist.");
             }
 
             if ($transaction->is_posted) {
-                throw new Exception("Transaction with id {$id} can't be updated.");
+                throw new CustomValidationException("Transaction with id {$id} can't be updated.");
             }
 
             $transaction = $this->transactionRepository->updateTransaction($transaction, $data);
@@ -120,11 +121,11 @@ class LedgerService implements ILedgerService
         $transaction = $this->transactionRepository->findTransaction($id);
 
         if (!$transaction) {
-            throw new ModelNotFoundException("Transaction with id {$id} does not exist.");
+            throw new CustomNotFoundException("Transaction with id {$id} does not exist.");
         }
 
         if ($transaction->is_posted) {
-            throw new Exception("Transaction with id {$id} has been already posted.");
+            throw new CustomValidationException("Transaction with id {$id} has been already posted.");
         }
 
         return $this->transactionRepository->deleteTransaction($transaction);
@@ -136,7 +137,7 @@ class LedgerService implements ILedgerService
     }
 
     /**
-     * @throws Exception
+     * @throws CustomValidationException
      */
     private function checkJournalEntriesValidity(array $entries): void
     {
@@ -144,10 +145,15 @@ class LedgerService implements ILedgerService
         $credit = 0;
 
         if (count($entries) < 2) {
-            throw new Exception("There must be at least two entries: credit and debit.");
+            throw new CustomValidationException("There must be at least two entries: credit and debit.");
         }
 
         foreach ($entries as $entry) {
+
+            if ($entry["amount"] <= 0) {
+                throw new CustomValidationException("Amount must be greater than 0.");
+            }
+
             if ($entry["type"] === "debit") {
                 $debit = $debit + $entry["amount"];
             } else {
@@ -156,23 +162,20 @@ class LedgerService implements ILedgerService
         }
 
         if (abs($debit - $credit) > 0.001) {
-            throw new Exception("Accounting Error: Total Debits ({$debit}) must be equal to Total Credits ({$credit}).");
+            throw new CustomValidationException("Accounting Error: Total Debits ({$debit}) must be equal to Total Credits ({$credit}).");
         }
     }
 
-    /**
-     * @throws Exception
-     */
     private function checkAccountValidity(int $id): void
     {
         $account = $this->accountRepository->findAccount($id, false);
 
         if (!$account) {
-            throw new ModelNotFoundException("Accounting Error: Account ID {$id} does not exist.");
+            throw new CustomNotFoundException("Accounting Error: Account ID {$id} does not exist.");
         }
 
         if (!$account->is_active) {
-            throw new Exception("Account '{$account->name}' ({$account->code}) is currently inactive.");
+            throw new CustomValidationException("Account '{$account->name}' ({$account->code}) is currently inactive.");
         }
     }
 
@@ -215,7 +218,7 @@ class LedgerService implements ILedgerService
                 ->sum('amount');
 
             $debitTurnover = $entries
-                ->filter(fn($e) => $e->transaction->date >= $from &&
+                ->filter(fn($e) => $e->transaction->date > $from &&
                     $e->transaction->date < $to &&
                     $e->type === 'debit'
                 )
